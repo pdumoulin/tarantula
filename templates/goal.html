@@ -1,1 +1,11 @@
-<iframe width='100%' height='100%' src='http://wejustscored.com/teams/{{team}}.html'></iframe>
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/goal.css')}}">
+<script src="{{url_for('static', filename='scripts/goal.js')}}"></script>
+
+<audio id="goalSong">
+    <source src="{{url_for('static', filename='audio/')}}{{team}}.mp3" type="audio/mpeg">
+</audio>
+
+<button class="speakerButton" onclick="playAudio()">
+    <img src="{{url_for('static', filename='images/speaker.jpg')}}">
+</button>
