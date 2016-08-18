@@ -19,7 +19,7 @@ def switches():
         for switch in SWITCHES:
             output.append({
                 'status' : switch.status(),
-                'name'   : switch.name()
+                'name'   : switch.identify()
             })
     return render_template('switches.html', switches=output)
 
