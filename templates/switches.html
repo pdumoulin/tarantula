@@ -4,7 +4,7 @@
 
 <div id="switches" class="container">
     {% for switch in switches %}
-        <button id="switch" class="status{{switch.status}} switch" 
+        <button id="switch" name="{{switch.ip}}" class="status{{switch.status}} switch" 
             onclick="toggleLights({{loop.index0}})">{{switch.name}}</button>
     {% endfor %}
     <button class="switch" onclick="reload()">Reload</button>
