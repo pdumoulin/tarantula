@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# /etc/rc.local setup (make sure system has exec and read or else reboot hangs)
-# /home/pi/tarantule/run.sh & 
-
 export PYTHONPATH=$PYTHONPATH:/home/pi/blinky
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
