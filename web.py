@@ -1,4 +1,5 @@
 
+from multiprocessing.pool import ThreadPool
 from blinky import wemo
 from flask import Flask, request, render_template
 application = Flask(__name__)
@@ -15,13 +16,15 @@ def switches():
         SWITCHES[int(request.values.get('index'))].toggle()
         return ''
     elif request.method == 'GET':
-        output = []
-        for switch in SWITCHES:
-            output.append({
+        def fetch_data(switch):
+            return {
                 'status' : switch.status(),
                 'name'   : switch.identify(),
                 'ip'     : switch.ip
-            })
+            }
+        pool = ThreadPool(processes=3)
+        workers = [pool.apply_async(fetch_data, (switch,)) for switch in SWITCHES]
+        output = [worker.get() for worker in workers]
     return render_template('switches.html', switches=output)
 
 @application.route("/goal")
