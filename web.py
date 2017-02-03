@@ -24,7 +24,8 @@ def switches():
             }
         pool = ThreadPool(processes=3)
         workers = [pool.apply_async(fetch_data, (switch,)) for switch in SWITCHES]
-        output = [worker.get() for worker in workers]
+        output = [worker.get(timeout=5) for worker in workers]
+        pool.close()
     return render_template('switches.html', switches=output)
 
 @application.route("/goal")
