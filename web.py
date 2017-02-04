@@ -5,9 +5,9 @@ from flask import Flask, request, render_template
 application = Flask(__name__)
 
 SWITCHES = [
-    wemo('192.168.1.81'),
-    wemo('192.168.1.83'),
-    wemo('192.168.1.85')
+    wemo('192.168.1.81', 1),
+    wemo('192.168.1.83', 1),
+    wemo('192.168.1.85', 1)
 ]
 
 @application.route("/switches", methods=['GET', 'POST'])
