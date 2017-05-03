@@ -10,6 +10,21 @@ SWITCHES = [
     wemo('192.168.1.85', 1)
 ]
 
+@application.route("/on")
+def on():
+    SWITCHES[int(request.values.get('index'))].on()
+    return ''
+
+@application.route("/off")
+def off():
+    SWITCHES[int(request.values.get('index'))].off()
+    return ''
+
+@application.route("/toggle")
+def toggle():
+    SWITCHES[int(request.values.get('index'))].toggle()
+    return ''
+
 @application.route("/switches", methods=['GET', 'POST'])
 def switches():
     if request.method == 'POST':
