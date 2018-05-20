@@ -1,6 +1,8 @@
 
 from multiprocessing.pool import ThreadPool
 from blinky import wemo
+from ir_library import Librarian
+from ir_devices import DeviceList
 from flask import Flask, request, render_template
 application = Flask(__name__)
 
@@ -9,6 +11,22 @@ SWITCHES = [
     wemo('192.168.1.83', 1),
     wemo('192.168.1.85', 1)
 ]
+
+IR_BUTTONS = [
+    {'name' : 'power', 'remote' : 'tv', 'button' : 'power'},
+    {'name' : 'source', 'remote' : 'tv', 'button' : 'source'},
+    {'name' : 'enter', 'remote' : 'tv', 'button' : 'enter'},
+    {'name' : 'exit', 'remote' : 'tv', 'button' : 'exit'},
+    {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
+    {'name' : '2 - empty', 'remote' : 'switch', 'button' : '2'},
+    {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
+    {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
+    {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
+    {'name' : 'info', 'remote' : 'tv', 'button' : 'info'}
+]
+
+IR_LIBRARIAN = Librarian('/home/pi/ir_tools/ir_library/')
+IR_DEVICE = DeviceList().get('default')
 
 @application.route("/on")
 def on():
@@ -46,6 +64,16 @@ def switches():
 @application.route("/goal")
 def goal():
     SWITCHES[0].toggle()
-    return render_template('goal.html', 
-        team=request.args.get('team', 'nyr'))
+    return render_template('goal.html', team=request.args.get('team', 'nyr'))
 
+@application.route("/ir_press")
+def ir_press():
+    remote_input = request.values.get('remote')
+    button_input = request.values.get('button')
+    code = IR_LIBRARIAN.read(remote_input, button_input)
+    IR_DEVICE.send_data(code)
+    return ''
+
+@application.route("/remote")
+def remote():
+    return render_template('remote.html', options=IR_BUTTONS)

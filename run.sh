@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export PYTHONPATH=$PYTHONPATH:/home/pi/blinky
+export PYTHONPATH=$PYTHONPATH:/home/pi/ir_tools
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 uwsgi \

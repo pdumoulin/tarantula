@@ -1,0 +1,10 @@
+
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/remote.css')}}">
+<script src="{{url_for('static', filename='scripts/remote.js')}}"></script>
+
+<div class="container">
+    {% for option in options %}
+        <button class="irbutton" 
+            onclick="sendCode('{{option.remote}}', '{{option.button}}')">{{option.name}}</button>
+    {% endfor %}
+</div>
