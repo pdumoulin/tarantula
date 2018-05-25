@@ -8,7 +8,9 @@ application = Flask(__name__)
 
 SWITCHES = [
     wemo('192.168.1.81', 1),
+    wemo('192.168.1.84', 1),
     wemo('192.168.1.83', 1),
+    wemo('192.168.1.82', 1),
     wemo('192.168.1.85', 1)
 ]
 
@@ -49,15 +51,29 @@ def switches():
         SWITCHES[int(request.values.get('index'))].toggle()
         return ''
     elif request.method == 'GET':
-        def fetch_data(switch):
+        def output_obj(status, name, ip):
             return {
-                'status' : switch.status(),
-                'name'   : switch.identify(),
-                'ip'     : switch.ip
+                'status' : status,
+                'name'   : name,
+                'ip'     : ip
             }
+        def fetch_data(switch):
+            status = 1 if switch.status() in switch.ON_STATES else 0
+            return output_obj(
+                status,
+                switch.identify(),
+                switch.ip
+            )
+
         pool = ThreadPool(processes=3)
         workers = [pool.apply_async(fetch_data, (switch,)) for switch in SWITCHES]
-        output = [worker.get(timeout=5) for worker in workers]
+        # output = [worker.get(timeout=5) for worker in workers]
+        output = []
+        for worker in workers:
+            try:
+                output.append(worker.get(timeout=5))
+            except Exception as e:
+                output.append(output_obj(2, str(e), ''))
         pool.close()
     return render_template('switches.html', switches=output)
 

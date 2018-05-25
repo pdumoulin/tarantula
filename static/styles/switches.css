@@ -1,12 +1,12 @@
 
-.container{
+.container {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.switch{
+.switch {
     margin: auto;
     width: 100%;
     height: 100%;
@@ -14,11 +14,14 @@
     font-size: 3em;
 }
 
-.status1{
+.status1 {
     background-color: #87b987;
 }
 
-.status0{
+.status0 {
     background-color: #9399bb;
 }
 
+.status2 {
+    background-color: #f47a42;
+}
