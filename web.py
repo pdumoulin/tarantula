@@ -10,7 +10,7 @@ SWITCHES = [
     wemo('192.168.1.81', 1),
     wemo('192.168.1.84', 1),
     wemo('192.168.1.83', 1),
-    wemo('192.168.1.82', 1),
+    # wemo('192.168.1.82', 1),
     wemo('192.168.1.85', 1)
 ]
 
@@ -27,7 +27,7 @@ IR_BUTTONS = [
     {'name' : 'info', 'remote' : 'tv', 'button' : 'info'}
 ]
 
-IR_LIBRARIAN = Librarian('/home/pi/ir_tools/ir_library/')
+IR_LIBRARIAN = Librarian('/home/pi/ir-tools/ir_library/')
 IR_DEVICE = DeviceList().get('default')
 
 @application.route("/on")
