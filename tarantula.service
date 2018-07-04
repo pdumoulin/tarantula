@@ -1,0 +1,12 @@
+[Unit]
+Description=Home Web Server
+After=multi-user.target
+
+[Service]
+Type=idle
+User=pi
+Group=pi
+ExecStart=/home/pi/tarantula/run.sh
+
+[Install]
+WantedBy=multi-user.target
