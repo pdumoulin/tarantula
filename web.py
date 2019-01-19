@@ -20,7 +20,7 @@ IR_BUTTONS = [
     {'name' : 'enter', 'remote' : 'tv', 'button' : 'enter'},
     {'name' : 'exit', 'remote' : 'tv', 'button' : 'exit'},
     {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
-    {'name' : '2 - empty', 'remote' : 'switch', 'button' : '2'},
+    {'name' : '2 - retropie', 'remote' : 'switch', 'button' : '2'},
     {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
     {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
     {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
