@@ -14,14 +14,14 @@
     font-size: 3em;
 }
 
-.status1 {
+.statusTrue, .status1 {
     background-color: #87b987;
 }
 
-.status0 {
+.statusFalse, .status0 {
     background-color: #9399bb;
 }
 
-.status2 {
+.statusError, .status2 {
     background-color: #f47a42;
 }
