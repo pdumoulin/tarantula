@@ -1,95 +1,147 @@
 
-from multiprocessing.pool import ThreadPool
-from blinky import wemo
-from ir_library import Librarian
-from ir_devices import DeviceList
+import sys
+import flask
+import broadlink
+import pkg_resources
+
+from concurrent.futures import ThreadPoolExecutor, wait
 from flask import Flask, request, render_template
+
+# sources installed locally (see run.sh)
+from ir_library import Librarian
+from blinky import Wemo
+
+# uwsgi callable
 application = Flask(__name__)
 
+# belkin brand wemo wifi switches config
 SWITCHES = [
-    wemo('192.168.1.81', 1),
-    wemo('192.168.1.84', 1),
-    wemo('192.168.1.83', 1),
-    # wemo('192.168.1.82', 1),
-    wemo('192.168.1.85', 1)
+    Wemo('192.168.1.81', 1),
+    Wemo('192.168.1.84', 1),
+    Wemo('192.168.1.83', 1),
+    Wemo('192.168.1.85', 1)
 ]
 
-IR_BUTTONS = [
-    {'name' : 'power', 'remote' : 'tv', 'button' : 'power'},
-    {'name' : 'source', 'remote' : 'tv', 'button' : 'source'},
-    {'name' : 'enter', 'remote' : 'tv', 'button' : 'enter'},
-    {'name' : 'exit', 'remote' : 'tv', 'button' : 'exit'},
-    {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
-    {'name' : '2 - retropie', 'remote' : 'switch', 'button' : '2'},
-    {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
-    {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
-    {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
-    {'name' : 'info', 'remote' : 'tv', 'button' : 'info'}
-]
+# broadlink infared emitter config
+IR = {
+    'buttons' : [
+        {'name' : 'power', 'remote' : 'tv', 'button' : 'power'},
+        {'name' : 'source', 'remote' : 'tv', 'button' : 'source'},
+        {'name' : 'enter', 'remote' : 'tv', 'button' : 'enter'},
+        {'name' : 'exit', 'remote' : 'tv', 'button' : 'exit'},
+        {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
+        {'name' : '2 - retropie', 'remote' : 'switch', 'button' : '2'},
+        {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
+        {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
+        {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
+        {'name' : 'info', 'remote' : 'tv', 'button' : 'info'}
+    ],
+    'librarian' : Librarian('/home/pi/ir-tools/ir_library'),
+    'device'    : None
+}
 
-IR_LIBRARIAN = Librarian('/home/pi/ir-tools/ir_library/')
-IR_DEVICE = DeviceList().get('default')
+# try to initialize emitter on app start, but don't let failure block startup
+def _init_ir(timeout=5):
+    devices = broadlink.discover(timeout)
+    devices[0].auth()
+    return devices[0]
+try:
+    if not IR['device']:
+        IR['device'] = _init_ir(10)
+except:
+    pass
 
-@application.route("/on")
-def on():
-    SWITCHES[int(request.values.get('index'))].on()
-    return ''
 
-@application.route("/off")
-def off():
-    SWITCHES[int(request.values.get('index'))].off()
-    return ''
+'''
+    return package and python versions on JSON
+'''
+@application.route('/version')
+def version():
+    return {
+        'flask'     : flask.__version__,
+        'broadlink' : pkg_resources.get_distribution('broadlink').version,
+        'py'        : sys.version
+    }
 
-@application.route("/toggle")
-def toggle():
-    SWITCHES[int(request.values.get('index'))].toggle()
-    return ''
-
-@application.route("/switches", methods=['GET', 'POST'])
+'''
+    GET  - return grid of buttons for wifi switches, js reloads page on press
+    POST - toggle switch at index in array
+'''
+@application.route('/switches', methods=['GET', 'POST'])
 def switches():
     if request.method == 'POST':
         SWITCHES[int(request.values.get('index'))].toggle()
         return ''
     elif request.method == 'GET':
-        def output_obj(status, name, ip):
+
+        # structure for representation of switch on page
+        def output_obj(status, name, ip=''):
             return {
                 'status' : status,
                 'name'   : name,
                 'ip'     : ip
             }
+
+        # pull data from one switch, handle errors gracefully
         def fetch_data(switch):
-            status = 1 if switch.status() in switch.ON_STATES else 0
-            return output_obj(
-                status,
-                switch.identify(),
-                switch.ip
-            )
-
-        pool = ThreadPool(processes=3)
-        workers = [pool.apply_async(fetch_data, (switch,)) for switch in SWITCHES]
-        # output = [worker.get(timeout=5) for worker in workers]
-        output = []
-        for worker in workers:
             try:
-                output.append(worker.get(timeout=5))
+                name = switch.identify()
             except Exception as e:
-                output.append(output_obj(2, str(e), ''))
-        pool.close()
-    return render_template('switches.html', switches=output)
+                name = str(e)
+            try:
+                status = switch.status()
+            except:
+                status = 'Error'
+            return output_obj(status, name, switch.ip)
 
-@application.route("/goal")
+        # current state of SWITCHES to return
+        output = []
+
+        # get switch data in parallel jobs
+        executor = ThreadPoolExecutor(max_workers=len(SWITCHES))
+        jobs = [executor.submit(fetch_data, switch) for switch in SWITCHES]
+
+        # run jobs and cleanup (timeout won't work with context manager)
+        wait(jobs, timeout=2, return_when='ALL_COMPLETED')
+        executor.shutdown(wait=False)
+
+        # build output according to job result (prserve order)
+        for job in jobs:
+            try:
+                if job.done():
+                    output.append(job.result())
+                else:
+                    output.append(output_obj('Error', 'JobTimeout'))
+            except Exception as e:
+                output.append(output_obj('Error', str(e)))
+
+        return render_template('switches.html', switches=output)
+
+'''
+    return "we just scored" in iframe and turn on goal lights
+'''
+@application.route('/goal')
 def goal():
-    SWITCHES[0].toggle()
+    SWITCHES[0].on()
     return render_template('goal.html', team=request.args.get('team', 'nyr'))
 
-@application.route("/ir_press")
+'''
+    forward ir packet according to remote and button name
+'''
+@application.route('/ir_press')
 def ir_press():
-    remote_input = request.values.get('remote')
-    button_input = request.values.get('button')
-    code = IR_LIBRARIAN.read(remote_input, button_input)
-    IR_DEVICE.send_data(code)
+    if not IR['device']:
+        IR['device'] = _init_ir()
+    code = IR['librarian'].read(
+        request.values.get('remote'),
+        request.values.get('button')
+    )
+    IR['device'].send_data(code)
     return ''
 
-@application.route("/remote")
+'''
+    return grid of buttons which will emit ir packets via ja
+'''
+@application.route('/remote')
 def remote():
-    return render_template('remote.html', options=IR_BUTTONS)
+    return render_template('remote.html', options=IR['buttons'])
