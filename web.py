@@ -27,14 +27,14 @@ IR = {
     'buttons' : [
         {'name' : 'power', 'remote' : 'tv', 'button' : 'power'},
         {'name' : 'source', 'remote' : 'tv', 'button' : 'source'},
-        {'name' : 'enter', 'remote' : 'tv', 'button' : 'enter'},
-        {'name' : 'exit', 'remote' : 'tv', 'button' : 'exit'},
+        {'name' : 'vol up', 'remote' : 'sound_bar', 'button' : 'vol_up'},
+        {'name' : 'vol down', 'remote' : 'sound_bar', 'button' : 'vol_down'},
         {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
         {'name' : '2 - retropie', 'remote' : 'switch', 'button' : '2'},
         {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
         {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
         {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
-        {'name' : 'info', 'remote' : 'tv', 'button' : 'info'}
+        {'name' : 'mute', 'remote' : 'sound_bar', 'button' : 'mute'}
     ],
     'librarian' : Librarian('/home/pi/ir-tools/ir_library'),
     'device'    : None
@@ -53,7 +53,7 @@ except:
 
 
 '''
-    return package and python versions on JSON
+    return package and python versions as JSON
 '''
 @application.route('/version')
 def version():
@@ -105,7 +105,7 @@ def switches():
         wait(jobs, timeout=2, return_when='ALL_COMPLETED')
         executor.shutdown(wait=False)
 
-        # build output according to job result (prserve order)
+        # build output according to job result (preserve order)
         for job in jobs:
             try:
                 if job.done():
