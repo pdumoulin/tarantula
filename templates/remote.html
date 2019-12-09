@@ -5,6 +5,6 @@
 <div class="container">
     {% for option in options %}
         <button class="irbutton" 
-            onclick="sendCode('{{option.remote}}', '{{option.button}}')">{{option.name}}</button>
+            onclick="sendCodes('{{option.actions}}')">{{option.name}}</button>
     {% endfor %}
 </div>

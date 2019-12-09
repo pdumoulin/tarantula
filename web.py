@@ -1,5 +1,6 @@
 
 import sys
+import json
 import flask
 import broadlink
 import pkg_resources
@@ -24,21 +25,27 @@ SWITCHES = [
 
 # broadlink infared emitter config
 IR = {
-    'buttons' : [
-        {'name' : 'power', 'remote' : 'tv', 'button' : 'power'},
-        {'name' : 'source', 'remote' : 'tv', 'button' : 'source'},
-        {'name' : 'vol up', 'remote' : 'sound_bar', 'button' : 'vol_up'},
-        {'name' : 'vol down', 'remote' : 'sound_bar', 'button' : 'vol_down'},
-        {'name' : '1 - chromecast', 'remote' : 'switch', 'button' : '1'},
-        {'name' : '2 - retropie', 'remote' : 'switch', 'button' : '2'},
-        {'name' : '3 - N64', 'remote' : 'switch', 'button' : '3'},
-        {'name' : '4 - computer', 'remote' : 'switch', 'button' : '4'},
-        {'name' : '5 - antenna', 'remote' : 'switch', 'button' : '5'},
-        {'name' : 'mute', 'remote' : 'sound_bar', 'button' : 'mute'}
-    ],
+    'buttons'   : [],
     'librarian' : Librarian('/home/pi/ir-tools/ir_library'),
     'device'    : None
 }
+
+# add buttons which each can do 1-N IR actions
+def _add_button(name, actions=[]):
+    IR['buttons'].append({
+        'name'    : name,
+        'actions' : json.dumps(actions)
+    })
+_add_button('power',          [('tv', 'power') , ('sound_bar', 'power')])
+_add_button('source',         [('tv', 'source')])
+_add_button('vol up',         [('sound_bar', 'vol_up')])
+_add_button('vol down',       [('sound_bar', 'vol_down')])
+_add_button('1 - chromecast', [('switch', '1')])
+_add_button('2 - retropi',    [('switch', '2')])
+_add_button('3 - N64',        [('switch', '3')])
+_add_button('4 - streamer',   [('switch', '4')])
+_add_button('5 - antenna',    [('switch', '5')])
+_add_button('mute',           [('sound_bar', 'mute')])
 
 # try to initialize emitter on app start, but don't let failure block startup
 def _init_ir(timeout=5):
@@ -50,7 +57,6 @@ try:
         IR['device'] = _init_ir(10)
 except:
     pass
-
 
 '''
     return package and python versions as JSON
