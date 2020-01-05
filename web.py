@@ -1,4 +1,5 @@
 
+import os
 import sys
 import json
 import flask
@@ -53,10 +54,18 @@ def _init_ir(timeout=5):
     devices[0].auth()
     return devices[0]
 try:
-    if not IR['device']:
-        IR['device'] = _init_ir(10)
+    IR['device'] = _init_ir(10)
 except:
     pass
+
+def _ir_send(remote, button):
+    if not IR['device']:
+        IR['device'] = _init_ir()
+    code = IR['librarian'].read(
+        remote,
+        button
+    )
+    IR['device'].send_data(code)
 
 '''
     return package and python versions as JSON
@@ -136,13 +145,7 @@ def goal():
 '''
 @application.route('/ir_press')
 def ir_press():
-    if not IR['device']:
-        IR['device'] = _init_ir()
-    code = IR['librarian'].read(
-        request.values.get('remote'),
-        request.values.get('button')
-    )
-    IR['device'].send_data(code)
+    _ir_send(request.values.get('remote'), request.values.get('button'))
     return ''
 
 '''
@@ -151,3 +154,17 @@ def ir_press():
 @application.route('/remote')
 def remote():
     return render_template('remote.html', options=IR['buttons'])
+
+'''
+    perform actions to prepare for bedtime
+'''
+@application.route('/bedtime')
+def bedtime():
+    chromecast_ip = '192.168.1.220'
+    result = os.system('ping -c 1 %s > /dev/null 2>&1' % chromecast_ip)
+    if result == 0:
+        _ir_send('tv', 'power')
+        _ir_send('sound_bar', 'power')
+    SWITCHES[2].off()
+    SWITCHES[1].on()
+    return 'Goodnight!'
