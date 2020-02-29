@@ -9,8 +9,7 @@ from blinky import Wemo  # installed locally (run.sh)
 
 import broadlink
 
-import flask
-from flask import Flask, render_template, request
+from flask import Flask, __version__ as flask_version, render_template, request
 
 from ir_library import Librarian  # installed locally (run.sh)
 
@@ -82,7 +81,7 @@ def _ir_send(remote, button):
 def version():
     """Return package and python versions as JSON."""
     return {
-        'flask': flask.__version__,
+        'flask': flask_version,
         'broadlink': pkg_resources.get_distribution('broadlink').version,
         'py': sys.version
     }
