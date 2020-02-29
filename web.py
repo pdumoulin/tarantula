@@ -1,17 +1,20 @@
+"""Flask web server for home automation."""
 
+import json
 import os
 import sys
-import json
-import flask
-import broadlink
-import pkg_resources
-
 from concurrent.futures import ThreadPoolExecutor, wait
-from flask import Flask, request, render_template
 
-# sources installed locally (see run.sh)
-from ir_library import Librarian
-from blinky import Wemo
+from blinky import Wemo  # installed locally (run.sh)
+
+import broadlink
+
+import flask
+from flask import Flask, render_template, request
+
+from ir_library import Librarian  # installed locally (run.sh)
+
+import pkg_resources
 
 # uwsgi callable
 application = Flask(__name__)
@@ -26,18 +29,21 @@ SWITCHES = [
 
 # broadlink infared emitter config
 IR = {
-    'buttons'   : [],
-    'librarian' : Librarian('/home/pi/ir-tools/ir_library'),
-    'device'    : None
+    'buttons': [],
+    'librarian': Librarian('/home/pi/ir-tools/ir_library'),
+    'device': None
 }
+
 
 # add buttons which each can do 1-N IR actions
 def _add_button(name, actions=[]):
     IR['buttons'].append({
-        'name'    : name,
-        'actions' : json.dumps(actions)
+        'name': name,
+        'actions': json.dumps(actions)
     })
-_add_button('power',          [('tv', 'power') , ('sound_bar', 'power')])
+
+
+_add_button('power',          [('tv', 'power'), ('sound_bar', 'power')])
 _add_button('source',         [('tv', 'source')])
 _add_button('vol up',         [('sound_bar', 'vol_up')])
 _add_button('vol down',       [('sound_bar', 'vol_down')])
@@ -48,15 +54,19 @@ _add_button('4 - streamer',   [('switch', '4')])
 _add_button('5 - antenna',    [('switch', '5')])
 _add_button('mute',           [('sound_bar', 'mute')])
 
+
 # try to initialize emitter on app start, but don't let failure block startup
 def _init_ir(timeout=5):
     devices = broadlink.discover(timeout)
     devices[0].auth()
     return devices[0]
+
+
 try:
     IR['device'] = _init_ir(10)
-except:
+except:  # noqa:E722
     pass
+
 
 def _ir_send(remote, button):
     if not IR['device']:
@@ -67,23 +77,24 @@ def _ir_send(remote, button):
     )
     IR['device'].send_data(code)
 
-'''
-    return package and python versions as JSON
-'''
+
 @application.route('/version')
 def version():
+    """Return package and python versions as JSON."""
     return {
-        'flask'     : flask.__version__,
-        'broadlink' : pkg_resources.get_distribution('broadlink').version,
-        'py'        : sys.version
+        'flask': flask.__version__,
+        'broadlink': pkg_resources.get_distribution('broadlink').version,
+        'py': sys.version
     }
 
-'''
-    GET  - return grid of buttons for wifi switches, js reloads page on press
-    POST - toggle switch at index in array
-'''
+
 @application.route('/switches', methods=['GET', 'POST'])
 def switches():
+    """Wifi switch control.
+
+    GET:return grid of buttons for wifi switches, js reloads page on press
+    POST: toggle switch at index
+    """  # noqa
     if request.method == 'POST':
         SWITCHES[int(request.values.get('index'))].toggle()
         return ''
@@ -92,9 +103,9 @@ def switches():
         # structure for representation of switch on page
         def output_obj(status, name, ip=''):
             return {
-                'status' : status,
-                'name'   : name,
-                'ip'     : ip
+                'status': status,
+                'name': name,
+                'ip': ip
             }
 
         # pull data from one switch, handle errors gracefully
@@ -105,7 +116,7 @@ def switches():
                 name = str(e)
             try:
                 status = switch.status()
-            except:
+            except:  # noqa:722
                 status = 'Error'
             return output_obj(status, name, switch.ip)
 
@@ -132,34 +143,30 @@ def switches():
 
         return render_template('switches.html', switches=output)
 
-'''
-    return "we just scored" in iframe and turn on goal lights
-'''
+
 @application.route('/goal')
 def goal():
+    """Return "we just scored" in iframe and turn on goal lights."""
     SWITCHES[0].on()
     return render_template('goal.html', team=request.args.get('team', 'nyr'))
 
-'''
-    forward ir packet according to remote and button name
-'''
+
 @application.route('/ir_press')
 def ir_press():
+    """Forward ir packet according to remote and button name."""
     _ir_send(request.values.get('remote'), request.values.get('button'))
     return ''
 
-'''
-    return grid of buttons which will emit ir packets via ja
-'''
+
 @application.route('/remote')
 def remote():
+    """Return grid of buttons which will emit ir packets via js."""
     return render_template('remote.html', options=IR['buttons'])
 
-'''
-    perform actions to prepare for bedtime
-'''
+
 @application.route('/bedtime')
 def bedtime():
+    """Perform actions to prepare for bedtime."""
     chromecast_ip = '192.168.1.220'
     result = os.system('ping -c 1 %s > /dev/null 2>&1' % chromecast_ip)
     if result == 0:
