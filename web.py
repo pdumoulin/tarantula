@@ -5,76 +5,14 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, wait
 
-from blinky import Wemo  # installed locally (run.sh)
-
-import broadlink
+from config import IR_EMITTER, REMOTES, SWITCHES
 
 from flask import Flask, __version__ as flask_version, render_template, request
-
-from ir_library import Librarian  # installed locally (run.sh)
 
 import pkg_resources
 
 # uwsgi callable
 application = Flask(__name__)
-
-# belkin brand wemo wifi switches config
-SWITCHES = [
-    Wemo('192.168.1.81', 1),
-    Wemo('192.168.1.84', 1),
-    Wemo('192.168.1.83', 1),
-    Wemo('192.168.1.85', 1)
-]
-
-# broadlink infared emitter config
-IR = {
-    'buttons': [],
-    'librarian': Librarian('/home/pi/ir-tools/ir_library'),
-    'device': None
-}
-
-
-# add buttons which each can do 1-N IR actions
-def _add_button(name, actions=[]):
-    IR['buttons'].append({
-        'name': name,
-        'actions': json.dumps(actions)
-    })
-
-
-_add_button('power',          [('tv', 'power'), ('sound_bar', 'power')])
-_add_button('source',         [('tv', 'source')])
-_add_button('vol up',         [('sound_bar', 'vol_up')])
-_add_button('vol down',       [('sound_bar', 'vol_down')])
-_add_button('1 - chromecast', [('switch', '1')])
-_add_button('2 - retropi',    [('switch', '2')])
-_add_button('3 - N64',        [('switch', '3')])
-_add_button('4 - streamer',   [('switch', '4')])
-_add_button('5 - antenna',    [('switch', '5')])
-_add_button('mute',           [('sound_bar', 'mute')])
-
-
-# try to initialize emitter on app start, but don't let failure block startup
-def _init_ir(timeout=5):
-    devices = broadlink.discover(timeout)
-    devices[0].auth()
-    return devices[0]
-
-
-try:
-    IR['device'] = _init_ir(10)
-except:  # noqa:E722
-    pass
-
-
-def _ir_send(remote, button):
-    if not IR['device']:
-        IR['device'] = _init_ir()
-    code = IR['librarian'].read(
-        remote,
-        button
-    )
-    IR['device'].send_data(code)
 
 
 @application.route('/version')
@@ -153,14 +91,25 @@ def goal():
 @application.route('/ir_press')
 def ir_press():
     """Forward ir packet according to remote and button name."""
-    _ir_send(request.values.get('remote'), request.values.get('button'))
+    IR_EMITTER.send_code(
+        request.values.get('remote'), request.values.get('button'))
     return ''
 
 
 @application.route('/remote')
 def remote():
     """Return grid of buttons which will emit ir packets via js."""
-    return render_template('remote.html', options=IR['buttons'])
+    remote_name = request.args.get('remote', 'main')
+    if remote_name not in REMOTES:
+        return 'Remote does not exists!'
+    output = []
+    for button in REMOTES[remote_name].buttons:
+        output.append({
+            'name': button.name,
+            'actions': json.dumps(button.actions)
+        })
+    return render_template(
+        'remote.html', options=output)
 
 
 @application.route('/bedtime')
@@ -169,8 +118,8 @@ def bedtime():
     chromecast_ip = '192.168.1.220'
     result = os.system('ping -c 1 %s > /dev/null 2>&1' % chromecast_ip)
     if result == 0:
-        _ir_send('tv', 'power')
-        _ir_send('sound_bar', 'power')
+        IR_EMITTER.send_code('tv', 'power')
+        IR_EMITTER.send_code('sound_bar', 'power')
     SWITCHES[2].off()
     SWITCHES[1].on()
     return 'Goodnight!'
