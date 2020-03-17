@@ -15,6 +15,12 @@ import pkg_resources
 application = Flask(__name__)
 
 
+@application.route('/')
+def hello():
+    """Hello World."""
+    return 'Hello'
+
+
 @application.route('/version')
 def version():
     """Return package and python versions as JSON."""
