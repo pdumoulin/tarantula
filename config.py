@@ -87,6 +87,62 @@ REMOTES_LIST = [
             '5 - antenna', [('switch', '5')]),
         RemoteButton(
             'mute', [('sound_bar', 'mute')])
+    ]),
+    Remote('antenna', [
+        RemoteButton(
+            'power', [('antenna', 'power')]),
+        RemoteButton(
+            'ok', [('antenna', 'ok')]),
+        RemoteButton(
+            'up', [('antenna', 'channel_up')]),
+        RemoteButton(
+            'down', [('antenna', 'channel_down')]),
+        RemoteButton(
+            '0', [('antenna', '0')]),
+        RemoteButton(
+            '1', [('antenna', '1')]),
+        RemoteButton(
+            '2', [('antenna', '2')]),
+        RemoteButton(
+            '3', [('antenna', '3')]),
+        RemoteButton(
+            '4', [('antenna', '4')]),
+        RemoteButton(
+            '5', [('antenna', '5')]),
+        RemoteButton(
+            '6', [('antenna', '6')]),
+        RemoteButton(
+            '7', [('antenna', '7')]),
+        RemoteButton(
+            '8', [('antenna', '8')]),
+        RemoteButton(
+            '9', [('antenna', '9')]),
+    ]),
+    Remote('blu_ray', [
+        RemoteButton(
+            'power', [('blu_ray', 'power')]),
+        RemoteButton(
+            'enter', [('blu_ray', 'select')]),
+        RemoteButton(
+            'up', [('blu_ray', 'up')]),
+        RemoteButton(
+            'down', [('blu_ray', 'down')]),
+        RemoteButton(
+            'left', [('blu_ray', 'left')]),
+        RemoteButton(
+            'right', [('blu_ray', 'right')]),
+        RemoteButton(
+            'play', [('blu_ray', 'play')]),
+        RemoteButton(
+            'pause', [('blu_ray', 'pause')]),
+        RemoteButton(
+            '<<', [('blu_ray', 'rewind')]),
+        RemoteButton(
+            '>>', [('blu_ray', 'fast_forward')]),
+        RemoteButton(
+            'menu', [('blu_ray', 'menu')]),
+        RemoteButton(
+            'stop', [('blu_ray', 'stop')]),
     ])
 ]
 REMOTES = {}

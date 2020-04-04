@@ -105,7 +105,7 @@ def ir_press():
 @application.route('/remote')
 def remote():
     """Return grid of buttons which will emit ir packets via js."""
-    remote_name = request.args.get('remote', 'main')
+    remote_name = request.args.get('r', 'main')
     if remote_name not in REMOTES:
         return 'Remote does not exists!'
     output = []
