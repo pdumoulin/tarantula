@@ -126,6 +126,7 @@ def bedtime():
     if result == 0:
         IR_EMITTER.send_code('tv', 'power')
         IR_EMITTER.send_code('sound_bar', 'power')
-    SWITCHES[2].off()
-    SWITCHES[1].on()
+    SWITCHES[0].off()
+    SWITCHES[1].off()
+    SWITCHES[2].on()
     return 'Goodnight!'
