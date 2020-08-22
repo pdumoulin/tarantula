@@ -21,6 +21,12 @@ def hello():
     return 'Hello'
 
 
+@application.route('/up')
+def up():
+    """Uptime check endpoint."""
+    return 'OK'
+
+
 @application.route('/version')
 def version():
     """Return package and python versions as JSON."""
