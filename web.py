@@ -136,3 +136,10 @@ def bedtime():
     SWITCHES[1].off()
     SWITCHES[2].on()
     return 'Goodnight!'
+
+
+@application.route('/sleeptime')
+def sleeptime():
+    """Perform actions to prepare for sleeptime."""
+    SWITCHES[2].off()
+    return 'Goodnight!'
