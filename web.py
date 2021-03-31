@@ -3,11 +3,17 @@
 import json
 import os
 import sys
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import wait
 
-from config import IR_EMITTER, REMOTES, SWITCHES
+from config import IR_EMITTER
+from config import REMOTES
+from config import SWITCHES
 
-from flask import Flask, __version__ as flask_version, render_template, request
+from flask import Flask
+from flask import __version__ as flask_version
+from flask import render_template
+from flask import request
 
 import pkg_resources
 
