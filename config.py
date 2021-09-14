@@ -11,12 +11,12 @@ from ir_library import Librarian  # installed locally (run.sh)
 
 # belkin brand wemo wifi switches config
 SWITCHES = [
-    Wemo('192.168.1.81', 1),
-    Wemo('192.168.1.83', 1),
-    Wemo('192.168.1.84', 1),
-    Wemo('192.168.1.82', 1),
-    Wemo('192.168.1.85', 1),
-    Wemo('192.168.1.198', 1)
+    Wemo('192.168.50.100', 1),
+    Wemo('192.168.50.196', 1),
+    Wemo('192.168.50.178', 1),
+    Wemo('192.168.50.190', 1),
+    Wemo('192.168.50.199', 1),
+    Wemo('192.168.50.200', 1)
 ]
 
 
