@@ -40,7 +40,7 @@ class Emitter():
 
     def send_code(self, remote, button):
         if not self.device:
-            self.device = self.init_device()
+            self.init_device()
         code = self.codes.read(
             remote,
             button
