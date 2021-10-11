@@ -141,6 +141,8 @@ def bedtime():
     SWITCHES[0].off()
     SWITCHES[1].off()
     SWITCHES[2].on()
+    SWITCHES[4].on()
+    SWITCHES[5].off()
     return 'Goodnight!'
 
 
@@ -148,4 +150,5 @@ def bedtime():
 def sleeptime():
     """Perform actions to prepare for sleeptime."""
     SWITCHES[2].off()
+    SWITCHES[4].off()
     return 'Goodnight!'
