@@ -11,6 +11,7 @@ from config import REMOTES
 from config import SWITCHES
 
 from flask import Flask
+from flask import Response
 from flask import __version__ as flask_version
 from flask import render_template
 from flask import request
@@ -19,6 +20,10 @@ import pkg_resources
 
 # uwsgi callable
 application = Flask(__name__)
+
+
+def _ping(ip, count):
+    return os.system(f'ping -c {count} {ip} > /dev/null 2>&1')
 
 
 @application.route('/')
@@ -30,7 +35,21 @@ def hello():
 @application.route('/up')
 def up():
     """Uptime check endpoint."""
-    return 'OK'
+    code = 200
+    host = request.args.get('host')
+    if host:
+        hosts = {
+            'mesh': '192.168.50.72',
+            'alberta': '192.168.50.20',
+            'pi0w': '192.168.50.74'
+        }
+        if host not in hosts:
+            code = 404
+        else:
+            result = _ping(hosts[host], 3)
+            if result != 0:
+                code = 504
+    return Response(str(code), status=code)
 
 
 @application.route('/version')
@@ -134,7 +153,7 @@ def remote():
 def bedtime():
     """Perform actions to prepare for bedtime."""
     chromecast_ip = '192.168.50.220'
-    result = os.system('ping -c 1 %s > /dev/null 2>&1' % chromecast_ip)
+    result = _ping(chromecast_ip, 1)
     if result == 0:
         IR_EMITTER.send_code('tv', 'power')
         IR_EMITTER.send_code('sound_bar', 'power')
