@@ -12,6 +12,7 @@
     height: 100%;
     font-weight: 700;
     font-size: 3em;
+    min-height: 0;
 }
 
 .statusTrue, .status1 {
