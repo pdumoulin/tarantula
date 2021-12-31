@@ -159,7 +159,8 @@ def bedtime():
         IR_EMITTER.send_code('sound_bar', 'power')
     SWITCHES[0].off()
     SWITCHES[1].off()
-    SWITCHES[2].on()
+    SWITCHES[2].off()
+    SWITCHES[3].on()
     SWITCHES[4].on()
     SWITCHES[5].off()
     return 'Goodnight!'
@@ -168,6 +169,5 @@ def bedtime():
 @application.route('/sleeptime')
 def sleeptime():
     """Perform actions to prepare for sleeptime."""
-    SWITCHES[2].off()
     SWITCHES[4].off()
     return 'Goodnight!'
