@@ -128,8 +128,12 @@ def goal():
 @application.route('/ir_press')
 def ir_press():
     """Forward ir packet according to remote and button name."""
-    IR_EMITTER.send_code(
-        request.values.get('remote'), request.values.get('button'))
+    remote = request.values.get('remote')
+    button = request.values.get('button')
+    if remote == 'switch' and button == '3':
+        os.system('sudo uhubctl -a cycle -l 1-1 -p 2 > /dev/null 2>&1')
+    else:
+        IR_EMITTER.send_code(remote, button)
     return ''
 
 
