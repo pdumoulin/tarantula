@@ -164,7 +164,6 @@ def bedtime():
     SWITCHES[0].off()
     SWITCHES[1].off()
     SWITCHES[2].off()
-    SWITCHES[3].on()
     SWITCHES[4].on()
     SWITCHES[5].off()
     return 'Goodnight!'
