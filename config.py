@@ -26,7 +26,7 @@ class Emitter():
     def __init__(self, index=0, timeout=10):
         self.index = 0
         self.timeout = 10
-        self.codes = Librarian('/home/pi/ir-tools/ir_library')
+        self.codes = Librarian('/home/pi/projects/ir-tools/ir_library')
         self.device = None
         self.init_device()
 

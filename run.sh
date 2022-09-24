@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PYTHONPATH=$PYTHONPATH:/home/pi/blinky
-export PYTHONPATH=$PYTHONPATH:/home/pi/ir-tools
+export PYTHONPATH=$PYTHONPATH:/home/pi/projects/blinky
+export PYTHONPATH=$PYTHONPATH:/home/pi/projects/ir-tools
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR

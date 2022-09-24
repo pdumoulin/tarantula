@@ -6,7 +6,7 @@ After=multi-user.target
 Type=idle
 User=pi
 Group=pi
-ExecStart=/home/pi/tarantula/run.sh
+ExecStart=/home/pi/projects/tarantula/run.sh
 
 [Install]
 WantedBy=multi-user.target
