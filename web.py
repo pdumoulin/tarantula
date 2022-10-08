@@ -35,19 +35,7 @@ def hello():
 @application.route('/up')
 def up():
     """Uptime check endpoint."""
-    code = 200
-    host = request.args.get('host')
-    if host:
-        hosts = {
-            'mesh': '192.168.50.72'
-        }
-        if host not in hosts:
-            code = 404
-        else:
-            result = _ping(hosts[host], 3)
-            if result != 0:
-                code = 504
-    return Response(str(code), status=code)
+    return Response(str(200), status=200)
 
 
 @application.route('/version')
