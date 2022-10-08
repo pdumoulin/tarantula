@@ -39,9 +39,7 @@ def up():
     host = request.args.get('host')
     if host:
         hosts = {
-            'mesh': '192.168.50.72',
-            'alberta': '192.168.50.20',
-            'pi0w': '192.168.50.74'
+            'mesh': '192.168.50.72'
         }
         if host not in hosts:
             code = 404
