@@ -142,7 +142,7 @@ def remote():
 @application.route('/bedtime')
 def bedtime():
     """Perform actions to prepare for bedtime."""
-    chromecast_ip = '192.168.50.220'
+    chromecast_ip = '192.168.50.221'
     result = _ping(chromecast_ip, 1)
     if result == 0:
         IR_EMITTER.send_code('tv', 'power')
