@@ -20,6 +20,7 @@ import pkg_resources
 
 # uwsgi callable
 application = Flask(__name__)
+application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
 
 
 def _ping(ip, count):
@@ -52,9 +53,9 @@ def version():
 def switches():
     """Wifi switch control.
 
-    GET:return grid of buttons for wifi switches, js reloads page on press
+    GET: return grid of button
     POST: toggle switch at index
-    """  # noqa
+    """
     if request.method == 'POST':
         SWITCHES[int(request.values.get('index'))].toggle()
         return ''
@@ -139,24 +140,26 @@ def remote():
         'remote.html', options=output)
 
 
+# TODO - make lamp in CONFIG, cycle through rest, turning off
+
 @application.route('/bedtime')
 def bedtime():
     """Perform actions to prepare for bedtime."""
-    chromecast_ip = '192.168.50.221'
-    result = _ping(chromecast_ip, 1)
-    if result == 0:
-        IR_EMITTER.send_code('tv', 'power')
-        IR_EMITTER.send_code('sound_bar', 'power')
+    # chromecast_ip = '192.168.50.221'
+    # result = _ping(chromecast_ip, 1)
+    # if result == 0:
+    #     IR_EMITTER.send_code('tv', 'power')
+    #     IR_EMITTER.send_code('sound_bar', 'power')
     SWITCHES[0].off()
     SWITCHES[1].off()
     SWITCHES[2].off()
-    SWITCHES[4].on()
-    SWITCHES[5].off()
+    SWITCHES[3].on()
+    SWITCHES[4].off()
     return 'Goodnight!'
 
 
 @application.route('/sleeptime')
 def sleeptime():
     """Perform actions to prepare for sleeptime."""
-    SWITCHES[4].off()
+    SWITCHES[3].off()
     return 'Goodnight!'

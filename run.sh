@@ -12,5 +12,6 @@ uwsgi \
     --logto logs/uwsgi.log \
     --pidfile var/app.pid \
     --wsgi-file web.py \
+    --processes 6 \
+    --enable-threads \
     --touch-reload web.py
-
