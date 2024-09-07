@@ -112,7 +112,7 @@ def switches():
 @application.route('/goal')
 def goal():
     """Return "we just scored" in iframe and turn on goal lights."""
-    SWITCHES[0][0].on()
+    _switch_func(0, 'on', fatal=True)
     return render_template('goal.html', team=request.args.get('team', 'nyr'))
 
 
@@ -144,27 +144,28 @@ def remote():
         'remote.html', options=output)
 
 
-# TODO - make lamp in CONFIG, cycle through rest, turning off
-
 @application.route('/bedtime')
 def bedtime():
     """Perform actions to prepare for bedtime."""
-    # chromecast_ip = '192.168.50.221'
-    # result = _ping(chromecast_ip, 1)
-    # if result == 0:
-    #     IR_EMITTER.send_code('tv', 'power')
-    #     IR_EMITTER.send_code('sound_bar', 'power')
-    SWITCHES[0][0].off()
-    SWITCHES[1][0].off()
-    SWITCHES[2][0].off()
-    SWITCHES[3][0].on()
-    SWITCHES[6][0].off()
+    _switch_func(0, 'off')
+    _switch_func(1, 'off')
+    _switch_func(2, 'off')
+    _switch_func(3, 'on')
+    _switch_func(6, 'on')
     return 'Goodnight!'
 
 
 @application.route('/sleeptime')
 def sleeptime():
     """Perform actions to prepare for sleeptime."""
-    SWITCHES[3][0].off()
-    SWITCHES[6][0].off()
+    _switch_func(3, 'off')
+    _switch_func(6, 'off')
     return 'Goodnight!'
+
+
+def _switch_func(index, action, fatal=False):
+    (switch, enabled) = SWITCHES[index]
+    if enabled:
+        getattr(switch, action)()
+    elif fatal:
+        raise Exception('Switch not enabled!')
