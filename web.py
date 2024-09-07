@@ -56,8 +56,12 @@ def switches():
     GET: return grid of button
     POST: toggle switch at index
     """
+    switches = [
+        x[0] for x in SWITCHES
+        if x[1] is True
+    ]
     if request.method == 'POST':
-        SWITCHES[int(request.values.get('index'))].toggle()
+        switches[int(request.values.get('index'))].toggle()
         return ''
     elif request.method == 'GET':
 
@@ -81,12 +85,12 @@ def switches():
                 status = 'Error'
             return output_obj(status, name, switch.ip)
 
-        # current state of SWITCHES to return
+        # current state of switches to return
         output = []
 
         # get switch data in parallel jobs
-        executor = ThreadPoolExecutor(max_workers=len(SWITCHES))
-        jobs = [executor.submit(fetch_data, switch) for switch in SWITCHES]
+        executor = ThreadPoolExecutor(max_workers=len(switches))
+        jobs = [executor.submit(fetch_data, switch) for switch in switches]
 
         # run jobs and cleanup (timeout won't work with context manager)
         wait(jobs, timeout=2, return_when='ALL_COMPLETED')
@@ -108,7 +112,7 @@ def switches():
 @application.route('/goal')
 def goal():
     """Return "we just scored" in iframe and turn on goal lights."""
-    SWITCHES[0].on()
+    SWITCHES[0][0].on()
     return render_template('goal.html', team=request.args.get('team', 'nyr'))
 
 
@@ -150,17 +154,17 @@ def bedtime():
     # if result == 0:
     #     IR_EMITTER.send_code('tv', 'power')
     #     IR_EMITTER.send_code('sound_bar', 'power')
-    SWITCHES[0].off()
-    SWITCHES[1].off()
-    SWITCHES[2].off()
-    SWITCHES[3].on()
-    SWITCHES[4].off()
+    SWITCHES[0][0].off()
+    SWITCHES[1][0].off()
+    SWITCHES[2][0].off()
+    SWITCHES[3][0].on()
+    SWITCHES[6][0].off()
     return 'Goodnight!'
 
 
 @application.route('/sleeptime')
 def sleeptime():
     """Perform actions to prepare for sleeptime."""
-    SWITCHES[3].off()
-    SWITCHES[4].off()
+    SWITCHES[3][0].off()
+    SWITCHES[6][0].off()
     return 'Goodnight!'
