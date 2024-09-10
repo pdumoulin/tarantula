@@ -151,7 +151,8 @@ def bedtime():
     _switch_func(1, 'off')
     _switch_func(2, 'off')
     _switch_func(3, 'on')
-    _switch_func(6, 'on')
+    _switch_func(4, 'off')
+    _switch_func(6, 'off')
     return 'Goodnight!'
 
 

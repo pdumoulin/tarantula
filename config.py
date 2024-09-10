@@ -9,15 +9,17 @@ import broadlink
 from ir_library import Librarian  # installed locally (run.sh)
 
 
+# TODO - think about caching and using switch string name as identifier
+
 # belkin brand wemo wifi switches config
 SWITCHES = [
-    (Wemo('192.168.50.100', 1), True),
-    (Wemo('192.168.50.196', 1), True),
-    (Wemo('192.168.50.190', 1), True),
-    (Wemo('192.168.50.199', 1), True),
-    (Wemo('192.168.50.178', 1), True),
-    (Wemo('192.168.50.242', 1), False),
-    (Wemo('192.168.50.200', 1), True)
+    (Wemo('192.168.50.100', 1), True),   # goal
+    (Wemo('192.168.50.196', 1), True),   # living room 1
+    (Wemo('192.168.50.190', 1), True),   # living room 2
+    (Wemo('192.168.50.199', 1), True),   # bedside lamp
+    (Wemo('192.168.50.178', 1), True),   # downstairs AC / xmas tree
+    (Wemo('192.168.50.242', 1), False),  # porch lights
+    (Wemo('192.168.50.200', 1), True)    # patio lights
 ]
 
 
