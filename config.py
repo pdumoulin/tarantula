@@ -89,7 +89,7 @@ REMOTES_LIST = [
         RemoteButton(
             '4 - streamer', [('switch', '4')]),
         RemoteButton(
-            '5 - antenna', [('switch', '5')]),
+            '5 - google tv', [('switch', '5')]),
         RemoteButton(
             'mute', [('sound_bar', 'mute')])
     ]),
