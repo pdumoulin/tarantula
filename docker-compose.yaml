@@ -1,0 +1,36 @@
+---
+services:
+
+  deploy:
+    platform: 'linux/amd64'
+    build:
+      context: .
+      target: app
+    ports:
+      - "80:5000"
+    restart: always
+
+  dev:
+    platform: 'linux/amd64'
+    build:
+      context: .
+      target: app
+    ports:
+      - "1986:5000"
+    environment:
+      - AUTO_RELOAD=true
+      - STATIC_CACHE_TIME=0
+    volumes:
+      - ./src:/var/app/src
+      - ./static:/var/app/static
+      - ./templates:/var/app/templates
+    stdin_open: true
+    tty: true
+
+  poetry_update:
+    platform: 'linux/amd64'
+    build:
+      context: .
+      target: poetry_update
+    volumes:
+      - ./poetry.lock:/var/app/poetry.lock

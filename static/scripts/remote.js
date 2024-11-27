@@ -1,19 +1,14 @@
-
-var sendCodes = function (actions) {
-  JSON.parse(actions).forEach(function (action) {
-    sendCode(action[0], action[1]);
-  });
-};
-
-var sendCode = function (remote, button) {
-  var xhr = new XMLHttpRequest();
-  var url = 'ir_press?remote=' + encodeURI(remote) + '&button=' + encodeURI(button);
-  xhr.open('GET', url)
-  xhr.onload = function (response) {
-    var responseCode = response.target.status;
-    if (responseCode !== 200) {
-      alert('Error! response code was ' + responseCode + ' for ' + remote + '_' + button);
-    }
-  };
-  xhr.send();
+var buttonPress = function (index) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', encodeURI('remote/' + index));
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.onload = function () {
+        if (xhr.status === 204) {
+            // TODO - update button colors
+        }
+        else {
+            alert('Error! response code was ' + xhr.status);
+        }
+    };
+    xhr.send();
 };

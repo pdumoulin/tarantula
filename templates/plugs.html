@@ -1,0 +1,13 @@
+<head>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', path='/styles/plugs.css')}}">
+    <script src="{{url_for('static', path='/scripts/plugs.js')}}"></script>
+</head>
+
+<body>
+    <div id="plugs" class="container">
+        {% for plug in plugs %}
+            <button id="plug{{plug.id}}" name="{{plug.ip}}" class="status{{'Error' if plug.status is none else plug.status}} plug"
+                onclick="toggle({{plug.id}})">{{plug.name}}</button>
+        {% endfor %}
+    </div>
+</body>
