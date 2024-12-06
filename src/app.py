@@ -1,6 +1,7 @@
 """App entrypoint."""
 
 import asyncio
+import uuid
 from typing import Annotated
 
 from fastapi import FastAPI
@@ -34,9 +35,20 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
 
 app = FastAPI(lifespan=config.lifespan)
 app.mount(
-    '/static', CacheControlledStaticFiles(directory='static'), name='static')
+    f'/static/{uuid.uuid4()}',
+    CacheControlledStaticFiles(directory='static'),
+    name='static')
 
 templates = templating.Jinja2Templates(directory='templates')
+
+
+@app.get('/', include_in_schema=False)
+async def root(request: Request):
+    """App root with metadata."""
+    return templates.TemplateResponse(
+        request=request,
+        name='root.html'
+    )
 
 
 @app.get('/healthcheck')

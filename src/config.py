@@ -41,10 +41,10 @@ REMOTE_BUTTONS = [
         'source',
         [IR_CODES['tv']['source']]),
     RemoteButton(
-        'vol up',
+        '➕ 🔊',
         [IR_CODES['speaker']['vol_up']]),
     RemoteButton(
-        'vol down',
+        '➖ 🔉',
         [IR_CODES['speaker']['vol_down']]),
     RemoteButton(
         '1 - chromecast',
@@ -62,7 +62,7 @@ REMOTE_BUTTONS = [
         '5 - googletv',
         [IR_CODES['hdmi_switch']['5']]),
     RemoteButton(
-        'mute',
+        '🔇',
         [IR_CODES['speaker']['mute']]),
 ]
 
