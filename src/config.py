@@ -29,6 +29,9 @@ PLUG_CACHE_NAME_TIME = 60 * 60 * 24
 # time in seconds to cache static files in browser
 STATIC_CACHE_TIME = int(os.environ.get('STATIC_CACHE_TIME', 3600))
 
+# unique key to bust cache on updates
+STATIC_CACHE_KEY = os.environ.get('STATIC_CACHE_KEY')
+
 # infared emitter by tv
 IR_EMITTER_IP = '192.168.50.96'
 

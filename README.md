@@ -10,13 +10,20 @@ docker compose up --build dev
 
 ### Deployment
 
+#### Configure Server
+
 Configuring for Ubuntu Server 24.04
+
 * [Install docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) using apt, **not** snap 
 * [Configure docker](https://docs.docker.com/engine/install/linux-postinstall/) to run as non-root user
 * [Enable docker](https://docker-docs.uclv.cu/engine/install/linux-postinstall/#systemd) to run on start
-* Run service in detach mode
+
+#### Start Service
 
 ```bash
-docker compose up --build -d deploy
+./start.sh
 ```
-* Service will auto-restart due to `restart: always` in `docker-compose.yaml`
+
+* Generate unique cache key for static files from latest commit hash
+* Run service in detached mode
+* Service will auto-restart due to `restart: always` in `docker-compose.yaml` when server reboots

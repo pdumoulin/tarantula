@@ -1,7 +1,6 @@
 """App entrypoint."""
 
 import asyncio
-import uuid
 from typing import Annotated
 
 from fastapi import FastAPI
@@ -35,7 +34,7 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
 
 app = FastAPI(lifespan=config.lifespan)
 app.mount(
-    f'/static/{uuid.uuid4()}',
+    f'/static/{config.STATIC_CACHE_KEY}',
     CacheControlledStaticFiles(directory='static'),
     name='static')
 

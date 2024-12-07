@@ -8,6 +8,9 @@ services:
       target: app
     ports:
       - "80:5000"
+    env_file:
+      - path: ./.env
+        required: false
     restart: always
 
   dev:
@@ -20,6 +23,7 @@ services:
     environment:
       - AUTO_RELOAD=true
       - STATIC_CACHE_TIME=0
+      - NUM_WORKERS=1
     volumes:
       - ./src:/var/app/src
       - ./static:/var/app/static
