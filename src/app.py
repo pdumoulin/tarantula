@@ -80,7 +80,8 @@ async def get_plugs(
                 y.status()
                 for y in active_plugs
             ]
-        )
+        ),
+        return_exceptions=True
     )
 
     # handle missing data
