@@ -184,6 +184,107 @@ async def post_remote(button_id: int):
         raise HTTPException(status_code=404)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-# TODO - endpoint for routines
 
-# TODO - update README.md and service start config
+# GET in order to load on phone or watch browser easily
+@app.get('/routines/{routine_name}')
+async def run_routine(
+        request: Request,
+        routine_name: models.Routine,
+        content_type: Annotated[str | None, Header()] = None
+        ):
+    """Execute a routine."""
+    plugs = app.state.plugs
+
+    # defaults
+    on_plug_names = []
+    off_plug_names = []
+    icon = 'spider'
+    success = True
+
+    try:
+        # filter out plugs that are not active
+        active_plugs = [x for x in plugs if x]
+
+        # load plug names
+        await asyncio.gather(
+            *[
+                x.identify()
+                for x in active_plugs
+            ]
+        )
+
+        # change variables based on routine
+        if routine_name == models.Routine.BEDTIME:
+            icon = 'bedtime'
+            on_plug_names = [
+                'bedroom lamp'
+            ]
+            off_plug_names = [
+                'living room',
+                'christmas tree',
+                'goal',
+                'patio lights'
+            ]
+        elif routine_name == models.Routine.SLEEPTIME:
+            icon = 'sleeptime'
+            off_plug_names = [
+                'living room',
+                'christmas tree',
+                'goal',
+                'patio lights',
+                'bedroom lamp'
+            ]
+        else:
+            raise NotImplementedError()
+
+        # filter plugs based on configured names
+        on_plugs = _filter_plugs(active_plugs, on_plug_names)
+        off_plugs = _filter_plugs(active_plugs, off_plug_names)
+
+        # perform actions
+        await asyncio.gather(
+            *(
+                [
+                    x.on()
+                    for x in on_plugs
+                ] +
+                [
+                    y.off()
+                    for y in off_plugs
+                ]
+
+            )
+        )
+    except Exception:
+        # TODO - logging of stack traces
+        success = False
+
+    # return data
+    if content_type == 'application/json':
+        if success:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+        else:
+            raise HTTPException(status_code=504)
+    return templates.TemplateResponse(
+        request=request,
+        name='routines.html.jinja',
+        context={
+            'icon': icon,
+            'name': routine_name.value.title(),
+            'success': success
+        }
+    )
+
+
+def _filter_plugs(plugs: list[AsyncWemo], names: list[str]):
+    """Filter list of plugs containing matches from list of names."""
+    return [
+        plug
+        for plug in plugs
+        if any(
+            [
+                name in plug._name.lower()
+                for name in names
+            ]
+        )
+    ]

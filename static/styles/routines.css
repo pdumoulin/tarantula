@@ -1,0 +1,13 @@
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+p {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 40vh;
+}
