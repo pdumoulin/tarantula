@@ -47,7 +47,8 @@ async def root(request: Request):
     """App root with metadata."""
     return templates.TemplateResponse(
         request=request,
-        name='root.html'
+        name='root.html.jinja',
+        context={'icon': 'spider'}
     )
 
 
@@ -116,9 +117,10 @@ async def get_plugs(
         return return_plugs
     return templates.TemplateResponse(
         request=request,
-        name='plugs.html',
+        name='plugs.html.jinja',
         context={
-            'plugs': return_plugs
+            'plugs': return_plugs,
+            'icon': 'plug'
         }
     )
 
@@ -165,9 +167,10 @@ async def get_remote(request: Request):
     ]
     return templates.TemplateResponse(
         request=request,
-        name='remote.html',
+        name='remote.html.jinja',
         context={
-            'buttons': buttons
+            'buttons': buttons,
+            'icon': 'tv'
         }
     )
 
