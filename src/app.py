@@ -222,7 +222,8 @@ async def run_routine(
                 'living room',
                 'christmas tree',
                 'goal',
-                'patio lights'
+                'patio lights',
+                'downstairs ac'
             ]
         elif routine_name == models.Routine.SLEEPTIME:
             icon = 'sleeptime'
@@ -231,6 +232,14 @@ async def run_routine(
                 'christmas tree',
                 'goal',
                 'patio lights',
+                'downstairs ac',
+                'bedroom lamp'
+            ]
+        elif routine_name == models.Routine.WAKETIME:
+            icon = 'waketime'
+            on_plug_names = [
+                'living room',
+                'christmas tree',
                 'bedroom lamp'
             ]
         else:

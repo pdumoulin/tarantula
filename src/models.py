@@ -26,3 +26,4 @@ class Routine(Enum):
 
     BEDTIME = 'bedtime'
     SLEEPTIME = 'sleeptime'
+    WAKETIME = 'waketime'
