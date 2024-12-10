@@ -1,6 +1,5 @@
 """Static application configs."""
 
-import asyncio
 import os
 from contextlib import asynccontextmanager
 
@@ -73,20 +72,9 @@ REMOTE_BUTTONS = [
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize objects used cross request for lifetime of app."""
-    all_plugs = [
-        AsyncWemo(x, name_cache_age=PLUG_CACHE_NAME_TIME)
-        for x in PLUG_IPS
-    ]
-    results = await asyncio.gather(
-        *[
-            y.identify()
-            for y in all_plugs
-        ],
-        return_exceptions=True
-    )
     app.state.plugs = [
-        plug if not isinstance(result, Exception) else False
-        for plug, result in zip(all_plugs, results)
+        AsyncWemo(ip, name_cache_age=PLUG_CACHE_NAME_TIME)
+        for ip in os.environ['ACTIVE_PLUG_IPS'].split(',')
     ]
     app.state.remote = Remote(IR_EMITTER_IP, REMOTE_BUTTONS)
     yield

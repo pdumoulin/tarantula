@@ -8,6 +8,8 @@ services:
       target: app
     ports:
       - "80:5000"
+    environment:
+      - NUM_WORKERS=6
     env_file:
       - path: ./.env
         required: false
