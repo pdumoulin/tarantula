@@ -1,6 +1,7 @@
 """App entrypoint."""
 
 import asyncio
+import logging
 from typing import Annotated
 
 from fastapi import FastAPI
@@ -57,7 +58,6 @@ async def healthcheck():
     return {'status': 'ok'}
 
 
-@app.get('/switches')  # backwards compatible
 @app.get('/plugs')
 async def get_plugs(
         request: Request,
@@ -264,7 +264,7 @@ async def run_routine(
             )
         )
     except Exception:
-        # TODO - logging of stack traces
+        logging.exception(f'Exception in routine {routine_name}')
         success = False
 
     # return data

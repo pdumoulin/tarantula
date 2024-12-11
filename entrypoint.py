@@ -39,7 +39,8 @@ async def main():
         host='0.0.0.0',
         port=5000,
         reload=auto_reload,
-        workers=num_workers
+        workers=num_workers,
+        log_config='log.ini'
     )
 
 if __name__ == '__main__':

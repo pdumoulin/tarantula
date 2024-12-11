@@ -23,13 +23,17 @@ PLUG_IPS = (
 )
 
 # time in seconds to cache plug name
-PLUG_CACHE_NAME_TIME = 60 * 60 * 24
+PLUG_CACHE_NAME_TIME = 31536000
 
 # time in seconds to cache static files in browser
-STATIC_CACHE_TIME = int(os.environ.get('STATIC_CACHE_TIME', 3600))
+STATIC_CACHE_TIME = int(os.environ.get('STATIC_CACHE_TIME', 31536000))
 
 # unique key to bust cache on updates
 STATIC_CACHE_KEY = os.environ.get('STATIC_CACHE_KEY')
+
+# caching on, and key not set, don't start up
+if STATIC_CACHE_TIME > 0 and not STATIC_CACHE_KEY:
+    raise Exception('Invalid static cache configuration')
 
 # infared emitter by tv
 IR_EMITTER_IP = '192.168.50.96'
