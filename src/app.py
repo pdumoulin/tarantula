@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from typing import Annotated
+from typing import Union
 
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -16,6 +17,7 @@ from fastapi import templating
 from pyblinky import AsyncWemo
 
 from starlette.responses import Response as sResponse
+from starlette.templating import _TemplateResponse as tResponse
 from starlette.types import Scope as sScope
 
 from src import config
@@ -43,7 +45,7 @@ templates = templating.Jinja2Templates(directory='templates')
 
 
 @app.get('/', include_in_schema=False)
-async def root(request: Request):
+async def root(request: Request) -> tResponse:
     """App root with metadata."""
     return templates.TemplateResponse(
         request=request,
@@ -53,16 +55,17 @@ async def root(request: Request):
 
 
 @app.get('/healthcheck')
-async def healthcheck():
+async def healthcheck() -> dict:
     """App up check."""
     return {'status': 'ok'}
 
 
-@app.get('/plugs')
+@app.get('/plugs', response_model=None)
 async def get_plugs(
         request: Request,
-        content_type: Annotated[str | None, Header()] = None
-        ) -> list[models.PlugResponse]:
+        content_type: Annotated[str | None, Header()] = None,
+        response_model=None
+        ) -> Union[list[models.PlugResponse], tResponse]:
     """Fetch current status of plugs."""
     plugs = app.state.plugs
 
@@ -86,11 +89,11 @@ async def get_plugs(
 
     # handle missing data
     names = [
-        x if not isinstance(x, Exception) else 'ERROR'
+        str(x) if not isinstance(x, Exception) else 'ERROR'
         for x in results[:len(results)//2]
     ]
     statuses = [
-        x if not isinstance(x, Exception) else None
+        bool(x) if not isinstance(x, Exception) else None
         for x in results[len(results)//2:]
     ]
     indexes = [
@@ -103,7 +106,6 @@ async def get_plugs(
     return_plugs = [
         models.PlugResponse(
             id=index,
-            ip=plug.ip,
             name=name,
             status=status
         )
@@ -141,7 +143,7 @@ def _find_plug(index: int) -> AsyncWemo:
 @app.patch('/plugs/{plug_id}')
 async def post_plug(
         plug_id: int,
-        body: models.PatchPlugBody):
+        body: models.PatchPlugBody) -> Response:
     """Post plug actions."""
     plug = _find_plug(plug_id)
     if body.name is not None:
@@ -155,7 +157,7 @@ async def post_plug(
 
 
 @app.get('/remote')
-async def get_remote(request: Request):
+async def get_remote(request: Request) -> Response:
     """Display remote."""
     buttons = [
         {
@@ -175,7 +177,7 @@ async def get_remote(request: Request):
 
 
 @app.post('/remote/{button_id}')
-async def post_remote(button_id: int):
+async def post_remote(button_id: int) -> Response:
     """Button press on remote."""
     try:
         app.state.remote.press_button(button_id)
@@ -185,12 +187,12 @@ async def post_remote(button_id: int):
 
 
 # GET in order to load on phone or watch browser easily
-@app.get('/routines/{routine_name}')
+@app.get('/routines/{routine_name}', response_model=None)
 async def run_routine(
         request: Request,
         routine_name: models.Routine,
         content_type: Annotated[str | None, Header()] = None
-        ):
+        ) -> Union[Response, tResponse]:
     """Execute a routine."""
     plugs = app.state.plugs
 
@@ -284,7 +286,7 @@ async def run_routine(
     )
 
 
-def _filter_plugs(plugs: list[AsyncWemo], names: list[str]):
+def _filter_plugs(plugs: list[AsyncWemo], names: list[str]) -> list[AsyncWemo]:
     """Filter list of plugs containing matches from list of names."""
     return [
         plug

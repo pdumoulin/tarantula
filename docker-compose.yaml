@@ -42,3 +42,9 @@ services:
       target: poetry_update
     volumes:
       - ./poetry.lock:/var/app/poetry.lock
+
+  lint_and_test:
+    platform: 'linux/amd64'
+    build:
+      context: .
+      target: lint_and_test

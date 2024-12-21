@@ -33,3 +33,12 @@ RUN useradd -ms /bin/bash appuser
 USER appuser
 RUN mkdir /tmp/logs
 CMD ["python", "entrypoint.py"]
+
+FROM base AS lint_and_test
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --no-cache
+
+COPY src ./src
+COPY .flake8 docker-compose.yaml lint_and_test.sh entrypoint.py ./
+CMD ["./lint_and_test.sh"]
