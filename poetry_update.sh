@@ -2,4 +2,4 @@
 
 set -e
 
-poetry update --lock $1
+poetry update --lock $@
