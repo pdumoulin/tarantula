@@ -63,8 +63,7 @@ async def healthcheck() -> dict:
 @app.get('/plugs', response_model=None)
 async def get_plugs(
         request: Request,
-        content_type: Annotated[str | None, Header()] = None,
-        response_model=None
+        content_type: Annotated[str | None, Header()] = None
         ) -> Union[list[models.PlugResponse], tResponse]:
     """Fetch current status of plugs."""
     plugs = app.state.plugs

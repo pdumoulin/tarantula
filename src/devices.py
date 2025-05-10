@@ -13,7 +13,7 @@ class Emitter():
         self.ip = ip
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """Find device on network."""
         self.device = None
         try:
@@ -22,11 +22,12 @@ class Emitter():
         except broadlink.exceptions.NetworkTimeoutError:
             pass
 
-    def send_data(self, code: bytes):
+    def send_data(self, code: bytes) -> None:
         """Send code."""
         if not self.device:
             self.reset()
-        self.device.send_data(code)
+        if self.device:
+            self.device.send_data(code)
 
 
 class RemoteButton():
@@ -46,7 +47,7 @@ class Remote():
         self.emitter = Emitter(ip)
         self.buttons = buttons
 
-    def press_button(self, index: int):
+    def press_button(self, index: int) -> None:
         """Perform actions."""
         for code in self.buttons[index].codes:
             self.emitter.send_data(base64.b64decode(code))

@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN python -m venv $VIRTUAL_ENV && \
-    pip install --no-cache-dir poetry==1.8.4
+    pip install --no-cache-dir poetry==2.1.3
 
 FROM base AS poetry_update
 

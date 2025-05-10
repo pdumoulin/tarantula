@@ -2,6 +2,7 @@
 
 import os
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
@@ -74,7 +75,7 @@ REMOTE_BUTTONS = [
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Initialize objects used cross request for lifetime of app."""
     app.state.plugs = [
         AsyncWemo(ip, name_cache_age=PLUG_CACHE_NAME_TIME)
