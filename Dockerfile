@@ -24,7 +24,6 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-cache --only main
 
 COPY log.ini ./
-COPY entrypoint.py ./
 COPY static ./static
 COPY templates ./templates
 COPY src ./src
@@ -32,7 +31,7 @@ COPY src ./src
 RUN useradd -ms /bin/bash appuser
 USER appuser
 RUN mkdir /tmp/logs
-CMD ["python", "entrypoint.py"]
+CMD ["python", "-m", "src.entrypoint"]
 
 FROM base AS lint_and_test
 
@@ -40,5 +39,14 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-cache
 
 COPY src ./src
-COPY .flake8 docker-compose.yaml lint_and_test.sh entrypoint.py ./
+COPY docker-compose.yaml lint_and_test.sh ./
 CMD ["./lint_and_test.sh"]
+
+FROM base AS format
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --no-cache
+
+COPY src ./src
+COPY format.sh ./
+CMD ["./format.sh"]

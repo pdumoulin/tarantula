@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tarantula"
-version = "2.0.0"
+version = "2.0.1"
 description = "web server for home projects"
 readme = "README.md"
 authors = [
@@ -15,12 +15,12 @@ fastapi = {extras = ["all"], version = "^0.115.5"}
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
-flake8 = "^5.0.4"
-flake8-docstrings = "^1.6.0"
-flake8-import-order = "^0.18.1"
-flake8-import-single = "^0.1.5"
-flake8-quotes = "^3.3.1"
+isort = "^6.0.1"
+ruff = "^0.11.1"
 yamllint = "^1.35.1"
+
+[lint.isort]
+multi_line_output=3
 
 [tool.mypy]
 disallow_untyped_defs = true

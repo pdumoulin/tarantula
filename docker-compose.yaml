@@ -48,3 +48,11 @@ services:
     build:
       context: .
       target: lint_and_test
+
+  format:
+    platform: 'linux/amd64'
+    build:
+      context: .
+      target: format
+    volumes:
+      - ./src:/var/app/src

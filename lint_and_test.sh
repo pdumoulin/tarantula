@@ -5,8 +5,9 @@ set -e
 echo 'Running yamllint'
 yamllint docker-compose.yaml
 
-echo 'Running flake8'
-flake8 src/ entrypoint.py
+echo 'Running ruff'
+ruff check src/ --no-cache --select I,F,E,W,B
+ruff format src/ --diff --no-cache
 
 echo 'Running mypy'
-mypy src/
+mypy --cache-dir=/dev/null src
