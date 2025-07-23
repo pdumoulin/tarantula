@@ -1,3 +1,4 @@
+# ruff:noqa E501
 # ref: https://github.com/pdumoulin/ir-tools/tree/main/ir_library
 
 IR_CODES = {
