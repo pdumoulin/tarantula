@@ -13,6 +13,8 @@ services:
     env_file:
       - path: ./.env
         required: false
+      - path: ./.sentry
+        required: false
     volumes:
       - ./logs:/tmp/logs
     restart: always
