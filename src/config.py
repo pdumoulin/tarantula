@@ -8,6 +8,8 @@ from pyblinky import AsyncWemo
 from src.constants import IR_CODES
 from src.devices import Remote, RemoteButton
 
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+
 # network location of plugs
 PLUG_IPS = (
     "192.168.50.100",

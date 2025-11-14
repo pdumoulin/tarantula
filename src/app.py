@@ -16,6 +16,7 @@ from pyblinky import AsyncWemo
 from starlette.responses import Response as sResponse
 from starlette.templating import _TemplateResponse as tResponse
 from starlette.types import Scope as sScope
+import sentry_sdk
 
 from src import config, models
 
@@ -28,6 +29,11 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
         )
         return response
 
+if config.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN,
+        traces_sample_rate=1.0
+    )
 
 app = FastAPI(lifespan=config.lifespan)
 app.mount(
