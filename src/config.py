@@ -1,19 +1,12 @@
 import os
 from contextlib import asynccontextmanager
-from enum import Enum
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from pyblinky import AsyncWemo
 
-from src.constants import IR_CODES
+from src.constants import IR_CODES, Environment
 from src.devices import Remote, RemoteButton
-
-
-class Environment(Enum):
-    PROD = "prod"
-    DEV = "dev"
-
 
 ENVIRONMENT = Environment(os.environ["ENVIRONMENT"])
 SENTRY_DSN = os.environ.get("SENTRY_DSN")

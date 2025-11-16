@@ -18,7 +18,7 @@ from starlette.responses import Response as sResponse
 from starlette.templating import _TemplateResponse as tResponse
 from starlette.types import Scope as sScope
 
-from src import config, models
+from src import config, constants, models
 
 
 class CacheControlledStaticFiles(staticfiles.StaticFiles):
@@ -30,7 +30,7 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
         return response
 
 
-if config.ENVIRONMENT != config.Environment.DEV or config.SENTRY_DSN:
+if config.ENVIRONMENT != constants.Environment.DEV or config.SENTRY_DSN:
     sentry_sdk.init(
         dsn=config.SENTRY_DSN,
         environment=config.ENVIRONMENT.value,
