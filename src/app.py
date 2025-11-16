@@ -30,8 +30,10 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
         return response
 
 
-if config.SENTRY_DSN:
-    sentry_sdk.init(dsn=config.SENTRY_DSN, traces_sample_rate=1.0)
+if config.ENVIRONMENT != config.Environment.DEV or config.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN, environment=config.ENVIRONMENT, traces_sample_rate=1.0
+    )
 
 app = FastAPI(lifespan=config.lifespan)
 app.mount(
