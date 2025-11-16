@@ -50,7 +50,7 @@ services:
     volumes:
       - ./poetry.lock:/var/app/poetry.lock
 
-  lint_and_test:
+  lint-and-test:
     platform: 'linux/amd64'
     build:
       context: .
