@@ -12,7 +12,7 @@ RUN python -m venv $VIRTUAL_ENV && \
 
 FROM base AS poetry_update
 
-COPY poetry_update.sh pyproject.toml ./
+COPY scripts/poetry_update.sh pyproject.toml ./
 
 RUN useradd -ms /bin/bash appuser
 USER appuser
@@ -39,7 +39,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-cache
 
 COPY src ./src
-COPY docker-compose.yaml lint_and_test.sh ./
+COPY docker-compose.yaml scripts/lint_and_test.sh ./
 CMD ["./lint_and_test.sh"]
 
 FROM base AS format
@@ -48,5 +48,5 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-cache
 
 COPY src ./src
-COPY format.sh ./
+COPY scripts/format.sh ./
 CMD ["./format.sh"]
