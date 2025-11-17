@@ -42,7 +42,7 @@ services:
     stdin_open: true
     tty: true
 
-  poetry_update:
+  poetry-update:
     platform: 'linux/amd64'
     build:
       context: .
@@ -50,11 +50,20 @@ services:
     volumes:
       - ./poetry.lock:/var/app/poetry.lock
 
+  hadolint:
+    image: hadolint/hadolint:latest-alpine
+    volumes:
+      - .:/tmp
+    command: hadolint /tmp/Dockerfile
+
   lint-and-test:
     platform: 'linux/amd64'
     build:
       context: .
       target: lint_and_test
+    depends_on:
+      hadolint:
+        condition: service_completed_successfully
 
   format:
     platform: 'linux/amd64'
