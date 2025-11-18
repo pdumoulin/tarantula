@@ -4,17 +4,18 @@ import broadlink
 
 
 class Emitter:
-    def __init__(self, ip: str):
+    ip: str
+    timeout: int
+    device: broadlink.Device
+
+    def __init__(self, ip: str, timeout: int = 30):
         self.ip = ip
-        self.reset()
+        self.timeout = timeout
+        self.device = None
 
     def reset(self) -> None:
-        self.device = None
-        try:
-            self.device = broadlink.hello(self.ip)
-            self.device.auth()
-        except broadlink.exceptions.NetworkTimeoutError:
-            pass
+        self.device = broadlink.hello(self.ip, timeout=self.timeout)
+        self.device.auth()
 
     def send_data(self, code: bytes) -> None:
         if not self.device:
