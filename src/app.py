@@ -63,10 +63,7 @@ async def healthcheck() -> dict:
 async def get_plugs(
     request: Request, content_type: Annotated[str | None, Header()] = None
 ) -> Union[list[models.PlugResponse], tResponse]:
-    plugs = app.state.plugs
-
-    # filter out plugs that are not active
-    active_plugs = [x for x in plugs if x]
+    active_plugs = app.state.plugs
 
     # gather data about current state
     results = await asyncio.gather(
@@ -83,7 +80,7 @@ async def get_plugs(
         bool(x) if not isinstance(x, Exception) else None
         for x in results[len(results) // 2 :]
     ]
-    indexes = [x for x in range(0, len(plugs)) if plugs[x]]
+    indexes = range(0, len(active_plugs))
 
     # zip together data into model
     return_plugs = [
@@ -101,22 +98,12 @@ async def get_plugs(
     )
 
 
-def _find_plug(index: int) -> AsyncWemo:
-    plug = None
-    try:
-        plug = app.state.plugs[index]
-    except IndexError:
-        pass
-
-    # inactive plug or invalid index
-    if not plug:
-        raise HTTPException(status_code=404)
-    return plug
-
-
 @app.patch("/plugs/{plug_id}")
 async def post_plug(plug_id: int, body: models.PatchPlugBody) -> Response:
-    plug = _find_plug(plug_id)
+    try:
+        plug = app.state.plugs[plug_id]
+    except IndexError as e:
+        raise HTTPException(status_code=404) from e
     if body.name is not None:
         await plug.rename(body.name)
     if body.status is not None:
@@ -155,7 +142,7 @@ async def run_routine(
     routine_name: models.Routine,
     content_type: Annotated[str | None, Header()] = None,
 ) -> Union[Response, tResponse]:
-    plugs = app.state.plugs
+    active_plugs = app.state.plugs
 
     # defaults
     on_plug_names = []
@@ -164,9 +151,6 @@ async def run_routine(
     success = True
 
     try:
-        # filter out plugs that are not active
-        active_plugs = [x for x in plugs if x]
-
         # load plug names
         await asyncio.gather(*[x.identify() for x in active_plugs])
 

@@ -1,3 +1,4 @@
+import asyncio
 import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
@@ -59,5 +60,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         AsyncWemo(ip, name_cache_age=PLUG_CACHE_NAME_TIME)
         for ip in os.environ["ACTIVE_PLUG_IPS"].split(",")
     ]
+    await asyncio.gather(*[x.identify() for x in app.state.plugs])
     app.state.remote = Remote(IR_EMITTER_IP, REMOTE_BUTTONS)
     yield
