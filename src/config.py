@@ -58,7 +58,7 @@ REMOTE_BUTTONS = [
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     app.state.plugs = []
-    with open(os.environ["DYNAMIC_CONFIG_FILENAME"], 'r') as f:
+    with open(os.environ["DYNAMIC_CONFIG_FILENAME"], "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             plug = AsyncWemo(row["ip"], name_cache_age=PLUG_CACHE_NAME_TIME)
