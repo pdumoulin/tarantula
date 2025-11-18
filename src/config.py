@@ -1,5 +1,6 @@
-import asyncio
+import csv
 import os
+import time
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -56,10 +57,13 @@ REMOTE_BUTTONS = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
-    app.state.plugs = [
-        AsyncWemo(ip, name_cache_age=PLUG_CACHE_NAME_TIME)
-        for ip in os.environ["ACTIVE_PLUG_IPS"].split(",")
-    ]
-    await asyncio.gather(*[x.identify() for x in app.state.plugs])
+    app.state.plugs = []
+    with open(os.environ["DYNAMIC_CONFIG_FILENAME"], 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            plug = AsyncWemo(row["ip"], name_cache_age=PLUG_CACHE_NAME_TIME)
+            plug._name = row["name"]
+            plug._name_last_update = int(time.time())
+            app.state.plugs.append(plug)
     app.state.remote = Remote(IR_EMITTER_IP, REMOTE_BUTTONS)
     yield

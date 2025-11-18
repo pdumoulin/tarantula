@@ -1,5 +1,7 @@
 import asyncio
+import csv
 import os
+import tempfile
 
 import uvicorn
 from pyblinky import AsyncWemo
@@ -16,13 +18,20 @@ async def main() -> None:
     results = await asyncio.gather(
         *[plug.identify() for plug in plugs], return_exceptions=True
     )
-    active_plug_ips = [
-        plug.ip
+    active_plugs  = [
+        {'ip': plug.ip, 'name': result}
         for plug, result in zip(plugs, results)
         if not isinstance(result, Exception)
     ]
-    os.environ["ACTIVE_PLUG_IPS"] = ",".join(active_plug_ips)
 
+    # write to file for each worker to read
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False) as tmpfile:
+        writer = csv.DictWriter(tmpfile, fieldnames=['ip', 'name'])
+        writer.writeheader()
+        writer.writerows(active_plugs)
+        os.environ["DYNAMIC_CONFIG_FILENAME"] = tmpfile.name
+
+    # start app with workers
     uvicorn.run(
         "src.app:app",
         host="0.0.0.0",
