@@ -1,4 +1,4 @@
-FROM python:3.13.0-slim-bookworm AS base
+FROM python:3.14.0-slim-bookworm AS base
 
 WORKDIR /var/app
 
@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN python -m venv $VIRTUAL_ENV && \
-    pip install --no-cache-dir poetry==2.1.3
+    pip install --no-cache-dir poetry==2.2.1
 
 FROM base AS poetry_update
 

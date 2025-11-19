@@ -20,7 +20,7 @@ async def main() -> None:
     )
     active_plugs = [
         {"ip": plug.ip, "name": result}
-        for plug, result in zip(plugs, results)
+        for plug, result in zip(plugs, results, strict=True)
         if not isinstance(result, Exception)
     ]
 

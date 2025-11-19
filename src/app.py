@@ -85,7 +85,9 @@ async def get_plugs(
     # zip together data into model
     return_plugs = [
         models.PlugResponse(id=index, name=name, status=status)
-        for plug, name, status, index in zip(active_plugs, names, statuses, indexes)
+        for plug, name, status, index in zip(
+            active_plugs, names, statuses, indexes, strict=True
+        )
     ]
 
     # return data
