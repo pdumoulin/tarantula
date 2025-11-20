@@ -1,14 +1,12 @@
-import csv
 import os
-import time
+import pickle
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
-from pyblinky import AsyncWemo
 
 from src.constants import IR_CODES, Environment
-from src.devices import Remote, RemoteButton
+from src.devices import RemoteButton
 
 ENVIRONMENT = Environment(os.environ["ENVIRONMENT"])
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
@@ -58,12 +56,8 @@ REMOTE_BUTTONS = [
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     app.state.plugs = []
-    with open(os.environ["DYNAMIC_CONFIG_FILENAME"], "r") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            plug = AsyncWemo(row["ip"], name_cache_age=PLUG_CACHE_NAME_TIME)
-            plug._name = row["name"]
-            plug._name_last_update = int(time.time())
-            app.state.plugs.append(plug)
-    app.state.remote = Remote(IR_EMITTER_IP, REMOTE_BUTTONS)
+    with open(os.environ["DYNAMIC_CONFIG_FILENAME"], "rb") as f:
+        dynamic_config: dict = pickle.load(f)
+        app.state.plugs = dynamic_config["plugs"]
+        app.state.remote = dynamic_config["remote"]
     yield
