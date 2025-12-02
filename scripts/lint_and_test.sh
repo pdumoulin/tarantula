@@ -10,4 +10,4 @@ ruff check src/ --no-cache --select I,F,E,W,B
 ruff format src/ --diff --no-cache
 
 echo 'Running mypy'
-mypy --cache-dir=/dev/null src
+mypy --disallow-untyped-defs --cache-dir=/dev/null src
