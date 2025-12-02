@@ -8,8 +8,7 @@
 <body>
     <div id="plugs" class="container">
         {% for plug in plugs %}
-            <button id="plug{{plug.id}}" name="{{plug.ip}}" class="status{{'Error' if plug.status is none else plug.status}} plug"
-                onclick="toggle({{plug.id}})">{{plug.name}}</button>
+            <button id="{{plug.id}}" name="{{plug.ip}}" class="status{{'Error' if plug.status is none else plug.status}} plug">{{plug.name}}</button>
         {% endfor %}
     </div>
 </body>

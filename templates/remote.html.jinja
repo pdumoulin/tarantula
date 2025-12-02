@@ -8,8 +8,7 @@
 <body>
     <div class="container">
         {% for button in buttons %}
-            <button class="irbutton"
-                onclick="buttonPress('{{button.id}}')">{{button.name}}</button>
+        <button id="{{button.id}}" class="irbutton">{{button.name}}</button>
         {% endfor %}
     </div>
 </body>
