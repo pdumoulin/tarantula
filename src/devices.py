@@ -15,6 +15,7 @@ class Emitter:
 
     def reset(self) -> None:
         self.device = broadlink.hello(self.ip, timeout=self.timeout)
+        self.device.timeout = self.timeout
         self.device.auth()
 
     def send_data(self, code: bytes) -> None:
