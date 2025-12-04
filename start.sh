@@ -4,7 +4,7 @@ set -e
 
 mkdir -p logs
 
-echo STATIC_CACHE_KEY=$(git rev-parse HEAD) > .env
+echo STATIC_CACHE_KEY=$(git log -1 --pretty=format:%H -- static) > .env
 
 docker compose build deploy
 
