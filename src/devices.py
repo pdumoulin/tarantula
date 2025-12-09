@@ -35,6 +35,7 @@ class Emitter:
         if self.device is not None:
             data["device"] = {
                 "id": self.device.id,
+                "timeout": self.timeout,
                 "host": self.device.host,
                 "mac": self.device.mac,
                 "devtype": self.device.devtype,
@@ -56,6 +57,7 @@ class Emitter:
             )
             self.device.aes = state["device"]["aes"]
             self.device.id = state["device"]["id"]
+            self.device.timeout = state["device"]["timeout"]
 
 
 class RemoteButton:
