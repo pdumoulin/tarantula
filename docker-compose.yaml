@@ -52,9 +52,10 @@ services:
 
   hadolint:
     image: hadolint/hadolint:latest-alpine
+    working_dir: /tmp
     volumes:
-      - .:/tmp
-    command: hadolint /tmp/Dockerfile
+      - ./Dockerfile:/tmp/Dockerfile
+    command: hadolint Dockerfile
 
   lint-and-test:
     platform: 'linux/amd64'
