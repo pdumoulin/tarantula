@@ -3,6 +3,7 @@ import os
 import pickle
 import tempfile
 
+import debugpy
 import uvicorn
 from pyblinky import AsyncWemo
 
@@ -13,6 +14,14 @@ from src.devices import Remote
 async def main() -> None:
     auto_reload = os.environ.get("AUTO_RELOAD", "").lower() == "true"
     num_workers = int(os.environ.get("NUM_WORKERS", 3))
+    debugger = os.environ.get("DEBUGGER", "").lower() == "true"
+
+    # listen for debugger connections
+    if debugger:
+        debugpy.listen(("0.0.0.0", 5678))
+        print('Waiting for debugger client...')
+        debugpy.wait_for_client()
+        print('Client attached!')
 
     # discover and auth remote
     remote = Remote(config.IR_EMITTER_IP, config.REMOTE_BUTTONS)

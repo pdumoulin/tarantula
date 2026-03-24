@@ -24,12 +24,15 @@ services:
     platform: 'linux/amd64'
     build:
       context: .
-      target: app
+      target: dev
     ports:
       - "1986:5000"
+      - "5678:5678"
     environment:
       - ENVIRONMENT=dev
       - AUTO_RELOAD=true
+      - DEBUGGER=false
+      - PYDEVD_DISABLE_FILE_VALIDATION=1
       - STATIC_CACHE_TIME=0
       - NUM_WORKERS=1
     env_file:

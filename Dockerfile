@@ -18,6 +18,21 @@ RUN useradd -ms /bin/bash appuser
 USER appuser
 ENTRYPOINT ["./poetry_update.sh"]
 
+FROM base AS dev
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-root --no-cache
+
+COPY log.ini ./
+COPY static ./static
+COPY templates ./templates
+COPY src ./src
+
+RUN useradd -ms /bin/bash appuser
+USER appuser
+RUN mkdir /tmp/logs
+CMD ["python", "-m", "src.entrypoint"]
+
 FROM base AS app
 
 COPY pyproject.toml poetry.lock ./
