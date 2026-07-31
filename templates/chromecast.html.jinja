@@ -1,0 +1,13 @@
+<head>
+    <title>Chromecast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', path='/styles/chromecast.css')}}">
+    <script src="{{url_for('static', path='/scripts/chromecast.js')}}"></script>
+    {% include 'favicon.html.jinja' %}
+</head>
+
+<body>
+    <div id="app" class="container">
+        <div class="spinner"></div>
+    </div>
+</body>

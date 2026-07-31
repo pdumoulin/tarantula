@@ -126,45 +126,60 @@ async def post_plug(plug_id: int, body: models.PatchPlugBody) -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-# TODO - html remote page
-@app.get("/chromecast", dependencies=[Depends(_reject_public)])
-async def get_chromecast(request: Request) -> Response:
+@app.get("/chromecast", response_model=None, dependencies=[Depends(_reject_public)])
+async def get_chromecast(
+    request: Request, content_type: Annotated[str | None, Header()] = None
+) -> Union[devices.ChromecastState, tResponse]:
+    if content_type != "application/json":
+        return templates.TemplateResponse(
+            request=request,
+            name="chromecast.html.jinja",
+            context={"icon": "chromecast"},
+        )
     return app.state.chromecast.get_state()
 
 
 @app.post("/chromecast/start", dependencies=[Depends(_reject_public)])
-async def post_start_chromecast(body: models.ChromecastStartBody) -> Response:
+async def post_start_chromecast(
+    body: models.ChromecastStartBody,
+) -> devices.ChromecastState:
     cc = app.state.chromecast
-    cc.start(body.url, body.mime_type)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return cc.start(body.url, body.mime_type)
 
 
 @app.post("/chromecast/pause", dependencies=[Depends(_reject_public)])
-async def post_pause_chromecast() -> Response:
+async def post_pause_chromecast() -> devices.ChromecastState:
     cc = app.state.chromecast
-    cc.pause()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return cc.pause()
 
 
 @app.post("/chromecast/play", dependencies=[Depends(_reject_public)])
-async def post_play_chromecast() -> Response:
+async def post_play_chromecast() -> devices.ChromecastState:
     cc = app.state.chromecast
-    cc.play()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return cc.play()
 
 
 @app.post("/chromecast/seek", dependencies=[Depends(_reject_public)])
-async def post_seek_chromecast(body: models.ChromecastSeekBody) -> Response:
+async def post_seek_chromecast(
+    body: models.ChromecastSeekBody,
+) -> devices.ChromecastState:
     cc = app.state.chromecast
-    cc.seek(body.time)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return cc.seek(body.time)
+
+
+@app.post("/chromecast/seek_by", dependencies=[Depends(_reject_public)])
+async def post_seek_by_chromecast(
+    body: models.ChromecastSeekByBody,
+) -> devices.ChromecastState:
+    cc = app.state.chromecast
+    return cc.seek_by(body.seconds)
 
 
 @app.post("/chromecast/stop", dependencies=[Depends(_reject_public)])
-async def post_stop_chromecast() -> Response:
+async def post_stop_chromecast() -> devices.ChromecastState:
     cc = app.state.chromecast
     cc.stop()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return cc.get_state()
 
 
 @app.get("/remote", dependencies=[Depends(_reject_public)])

@@ -13,6 +13,10 @@ class ChromecastSeekBody(BaseModel):
     time: float
 
 
+class ChromecastSeekByBody(BaseModel):
+    seconds: float
+
+
 class PatchPlugBody(BaseModel):
     name: Optional[str] = None
     status: Optional[bool] = None
