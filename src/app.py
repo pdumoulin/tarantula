@@ -5,7 +5,6 @@ from typing import Annotated, Union
 import sentry_sdk
 from fastapi import (
     Depends,
-    FastAPI,
     Header,
     HTTPException,
     Request,
@@ -44,7 +43,7 @@ def _reject_public(request: Request) -> None:
         raise HTTPException(status_code=401)
 
 
-app = FastAPI(lifespan=config.lifespan)
+app = config.TarantulaApp(lifespan=config.lifespan)
 app.mount(
     f"/static/{config.STATIC_CACHE_KEY}",
     CacheControlledStaticFiles(directory="static"),

@@ -4,9 +4,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
+from pyblinky import AsyncWemo
+from starlette.datastructures import State
 
 from src.constants import IR_CODES, Environment
-from src.devices import Chromecast, RemoteButton
+from src.devices import Chromecast, Remote, RemoteButton
 
 ENVIRONMENT = Environment(os.environ["ENVIRONMENT"])
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
@@ -58,15 +60,23 @@ REMOTE_BUTTONS = [
 ]
 
 
+class AppState(State):
+    plugs: list[AsyncWemo]
+    remote: Remote
+    chromecast: Chromecast
+
+
+class TarantulaApp(FastAPI):
+    state: AppState
+
+
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator:
+async def lifespan(app: TarantulaApp) -> AsyncGenerator:
     app.state.plugs = []
     with open(os.environ["DYNAMIC_CONFIG_FILENAME"], "rb") as f:
         dynamic_config: dict = pickle.load(f)
         app.state.plugs = dynamic_config["plugs"]
         app.state.remote = dynamic_config["remote"]
-
-    # TODO - strongly type app state data for mypy checking
 
     # must be done in app context due to threading
     app.state.chromecast = Chromecast(CHROMECAST_IP, CHROMECAST_PORT)

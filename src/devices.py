@@ -73,7 +73,7 @@ class Chromecast:
             raise ChromecastRequestNotAllowed() from e
         return self._wait_for_playback_status([ChromecastPlaybackStatus.PLAYING])
 
-    def seek(self, time: int) -> ChromecastState:
+    def seek(self, time: float) -> ChromecastState:
         try:
             self.device.media_controller.seek(time)
         except pychromecast.error.RequestFailed as e:
