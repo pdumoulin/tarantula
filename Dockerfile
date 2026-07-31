@@ -15,6 +15,7 @@ FROM base AS poetry_update
 COPY scripts/poetry_update.sh pyproject.toml ./
 
 RUN useradd -ms /bin/bash appuser
+# hadolint ignore=DL3066
 USER appuser
 ENTRYPOINT ["./poetry_update.sh"]
 
@@ -29,6 +30,7 @@ COPY templates ./templates
 COPY src ./src
 
 RUN useradd -ms /bin/bash appuser
+# hadolint ignore=DL3066
 USER appuser
 RUN mkdir /tmp/logs
 CMD ["python", "-m", "src.entrypoint"]

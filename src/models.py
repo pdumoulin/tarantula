@@ -4,6 +4,15 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class ChromecastStartBody(BaseModel):
+    url: str
+    mime_type: str
+
+
+class ChromecastSeekBody(BaseModel):
+    time: float
+
+
 class PatchPlugBody(BaseModel):
     name: Optional[str] = None
     status: Optional[bool] = None

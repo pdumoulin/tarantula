@@ -4,6 +4,7 @@ from typing import Annotated, Union
 
 import sentry_sdk
 from fastapi import (
+    Depends,
     FastAPI,
     Header,
     HTTPException,
@@ -18,7 +19,7 @@ from starlette.responses import Response as sResponse
 from starlette.templating import _TemplateResponse as tResponse
 from starlette.types import Scope as sScope
 
-from src import config, constants, models
+from src import config, constants, devices, models
 
 
 class CacheControlledStaticFiles(staticfiles.StaticFiles):
@@ -37,6 +38,12 @@ if config.ENVIRONMENT != constants.Environment.DEV or config.SENTRY_DSN:
         traces_sample_rate=1.0,
     )
 
+
+def _reject_public(request: Request) -> None:
+    if not request.client or request.client.host == config.PUBLIC_GATEWAY_IP:
+        raise HTTPException(status_code=401)
+
+
 app = FastAPI(lifespan=config.lifespan)
 app.mount(
     f"/static/{config.STATIC_CACHE_KEY}",
@@ -45,6 +52,13 @@ app.mount(
 )
 
 templates = templating.Jinja2Templates(directory="templates")
+
+
+@app.exception_handler(devices.ChromecastRequestNotAllowed)
+async def chromecast_conflict(
+    request: Request, exc: devices.ChromecastRequestNotAllowed
+) -> Response:
+    return Response(status_code=status.HTTP_409_CONFLICT)
 
 
 @app.get("/", include_in_schema=False)
@@ -116,7 +130,48 @@ async def post_plug(plug_id: int, body: models.PatchPlugBody) -> Response:
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.get("/remote")
+# TODO - html remote page
+@app.get("/chromecast", dependencies=[Depends(_reject_public)])
+async def get_chromecast(request: Request) -> Response:
+    return app.state.chromecast.get_state()
+
+
+@app.post("/chromecast/start", dependencies=[Depends(_reject_public)])
+async def post_start_chromecast(body: models.ChromecastStartBody) -> Response:
+    cc = app.state.chromecast
+    cc.start(body.url, body.mime_type)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/chromecast/pause", dependencies=[Depends(_reject_public)])
+async def post_pause_chromecast() -> Response:
+    cc = app.state.chromecast
+    cc.pause()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/chromecast/play", dependencies=[Depends(_reject_public)])
+async def post_play_chromecast() -> Response:
+    cc = app.state.chromecast
+    cc.play()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/chromecast/seek", dependencies=[Depends(_reject_public)])
+async def post_seek_chromecast(body: models.ChromecastSeekBody) -> Response:
+    cc = app.state.chromecast
+    cc.seek(body.time)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/chromecast/stop", dependencies=[Depends(_reject_public)])
+async def post_stop_chromecast() -> Response:
+    cc = app.state.chromecast
+    cc.stop()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.get("/remote", dependencies=[Depends(_reject_public)])
 async def get_remote(request: Request) -> Response:
     buttons = [
         {"id": idx, "name": x.name} for idx, x in enumerate(app.state.remote.buttons)
@@ -128,7 +183,7 @@ async def get_remote(request: Request) -> Response:
     )
 
 
-@app.post("/remote/{button_id}")
+@app.post("/remote/{button_id}", dependencies=[Depends(_reject_public)])
 async def post_remote(button_id: int) -> Response:
     try:
         app.state.remote.press_button(button_id)

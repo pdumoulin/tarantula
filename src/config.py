@@ -6,10 +6,12 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 
 from src.constants import IR_CODES, Environment
-from src.devices import RemoteButton
+from src.devices import Chromecast, RemoteButton
 
 ENVIRONMENT = Environment(os.environ["ENVIRONMENT"])
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
+
+PUBLIC_GATEWAY_IP = "192.168.50.1"
 
 # network location of plugs
 PLUG_IPS = (
@@ -34,6 +36,9 @@ STATIC_CACHE_KEY = os.environ.get("STATIC_CACHE_KEY")
 # caching on, and key not set, don't start up
 if STATIC_CACHE_TIME > 0 and not STATIC_CACHE_KEY:
     raise Exception("Invalid static cache configuration")
+
+CHROMECAST_IP = "192.168.50.236"
+CHROMECAST_PORT = 8009
 
 # infared emitter by tv
 IR_EMITTER_IP = "192.168.50.96"
@@ -60,4 +65,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         dynamic_config: dict = pickle.load(f)
         app.state.plugs = dynamic_config["plugs"]
         app.state.remote = dynamic_config["remote"]
+
+    # TODO - strongly type app state data for mypy checking
+
+    # must be done in app context due to threading
+    app.state.chromecast = Chromecast(CHROMECAST_IP, CHROMECAST_PORT)
     yield
