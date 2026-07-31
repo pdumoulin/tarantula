@@ -178,7 +178,13 @@ async def post_seek_by_chromecast(
 async def post_stop_chromecast() -> devices.ChromecastState:
     cc = app.state.chromecast
     cc.stop()
-    return cc.get_state()
+    return devices.ChromecastState(
+        playback_status=devices.ChromecastPlaybackStatus.UNKNOWN,
+        duration=None,
+        current_time=None,
+        title=None,
+        last_updated=None,
+    )
 
 
 @app.get("/remote", dependencies=[Depends(_reject_public)])
