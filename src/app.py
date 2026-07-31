@@ -77,6 +77,11 @@ async def healthcheck() -> dict:
 async def get_plugs(
     request: Request, content_type: Annotated[str | None, Header()] = None
 ) -> Union[list[models.PlugResponse], tResponse]:
+    if content_type != "application/json":
+        return templates.TemplateResponse(
+            request=request, name="plugs.html.jinja", context={"icon": "plug"}
+        )
+
     active_plugs = app.state.plugs
 
     # gather data about current state
@@ -97,21 +102,12 @@ async def get_plugs(
     indexes = range(0, len(active_plugs))
 
     # zip together data into model
-    return_plugs = [
+    return [
         models.PlugResponse(id=index, name=name, status=status)
         for plug, name, status, index in zip(
             active_plugs, names, statuses, indexes, strict=True
         )
     ]
-
-    # return data
-    if content_type == "application/json":
-        return return_plugs
-    return templates.TemplateResponse(
-        request=request,
-        name="plugs.html.jinja",
-        context={"plugs": return_plugs, "icon": "plug"},
-    )
 
 
 @app.patch("/plugs/{plug_id}")

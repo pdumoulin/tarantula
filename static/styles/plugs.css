@@ -14,14 +14,42 @@
     min-height: 0;
 }
 
-.statusTrue, .status1 {
+.plug:disabled {
+    opacity: 0.6;
+}
+
+.statusTrue {
     background-color: #87b987;
 }
 
-.statusFalse, .status0 {
+.statusFalse {
     background-color: #9399bb;
 }
 
-.statusError, .status2 {
+.statusError {
     background-color: #f47a42;
+}
+
+.spinner {
+    margin: auto;
+    width: 3em;
+    height: 3em;
+    border: 0.35em solid #9399bb;
+    border-top-color: #87b987;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error {
+    margin: auto;
+    font-weight: 700;
+    font-size: 2em;
+    text-align: center;
+    color: #f47a42;
 }
