@@ -15,6 +15,7 @@ class ChromecastPlaybackStatus(Enum):
     PAUSED = pychromecast.controllers.media.MEDIA_PLAYER_STATE_PAUSED
     IDLE = pychromecast.controllers.media.MEDIA_PLAYER_STATE_IDLE
     UNKNOWN = pychromecast.controllers.media.MEDIA_PLAYER_STATE_UNKNOWN
+    LOADING = "LOADING"
 
 
 class ChromecastState(BaseModel):
