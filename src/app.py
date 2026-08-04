@@ -30,11 +30,21 @@ class CacheControlledStaticFiles(staticfiles.StaticFiles):
         return response
 
 
+def before_sentry_send(
+    event: sentry_sdk._types.Event, hint: sentry_sdk._types.Hint
+) -> sentry_sdk._types.Event | None:
+    if log_record := hint.get("log_record"):
+        if log_record.name == "pychromecast.socket_client":
+            return None
+    return event
+
+
 if config.ENVIRONMENT != constants.Environment.DEV or config.SENTRY_DSN:
     sentry_sdk.init(
         dsn=config.SENTRY_DSN,
         environment=config.ENVIRONMENT.value,
         traces_sample_rate=1.0,
+        before_send=before_sentry_send,
     )
 
 
